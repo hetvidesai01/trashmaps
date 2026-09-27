@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   MapPin,
@@ -14,6 +15,8 @@ import { Button } from '../../components/common/Button'
 import { StatCard } from '../../components/common/StatCard'
 import { StatusBadge } from '../../components/common/StatusBadge'
 import { CollectionProgressBar } from '../../components/routes/CollectionProgressBar'
+import { PendingReportCard } from '../../components/reports/PendingReportCard'
+import { ReportReviewModal } from '../../components/reports/ReportReviewModal'
 import { PageContainer } from '../../components/layout/PageContainer'
 import { MapView } from '../../components/map/MapView'
 import { CollectionPointMarker } from '../../components/map/CollectionPointMarker'
@@ -26,8 +29,12 @@ import {
   getCurrentRoute,
   getDashboardStats,
   getRecentActivity,
+  getCitizenReports,
+  approveReport,
+  rejectReport,
 } from '../../services/api'
 import { formatDateTime } from '../../utils/format'
+import type { CitizenReport, CollectionPoint, CollectionRoute, DashboardStats } from '../../types'
 
 const TODAY_LABEL = new Date().toLocaleDateString('en-IN', {
   weekday: 'long',
@@ -36,13 +43,43 @@ const TODAY_LABEL = new Date().toLocaleDateString('en-IN', {
 })
 
 export function Dashboard() {
-  const { data: stats } = useAsyncData(getDashboardStats)
-  const { data: points } = useAsyncData(getCollectionPoints)
-  const { data: route } = useAsyncData(getCurrentRoute)
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [points, setPoints] = useState<CollectionPoint[] | null>(null)
+  const [route, setRoute] = useState<CollectionRoute | null>(null)
+  const [reports, setReports] = useState<CitizenReport[] | null>(null)
+  const [reviewingReport, setReviewingReport] = useState<CitizenReport | null>(null)
   const { data: activity } = useAsyncData(getRecentActivity)
+
+  async function refresh() {
+    const [nextStats, nextPoints, nextRoute, nextReports] = await Promise.all([
+      getDashboardStats(),
+      getCollectionPoints(),
+      getCurrentRoute(),
+      getCitizenReports(),
+    ])
+    setStats(nextStats)
+    setPoints(nextPoints)
+    setRoute(nextRoute)
+    setReports(nextReports)
+  }
+
+  useEffect(() => {
+    refresh()
+  }, [])
+
+  async function handleApprove(reportId: string) {
+    await approveReport(reportId)
+    await refresh()
+  }
+
+  async function handleReject(reportId: string) {
+    await rejectReport(reportId)
+    await refresh()
+  }
 
   const activePoints = points?.filter((point) => point.status === 'pending').slice(0, 5) ?? []
   const completedStops = route?.originalStops.filter((point) => point.status === 'collected').length ?? 0
+  const pendingReports = reports?.filter((report) => report.status === 'pending_verification') ?? []
 
   return (
     <PageContainer className="max-w-7xl">
@@ -145,6 +182,28 @@ export function Dashboard() {
         </Card>
       </div>
 
+      <section className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold text-ink">
+            Citizen reports awaiting verification
+          </h2>
+          {pendingReports.length > 0 && (
+            <span className="rounded-full bg-[#D97706]/10 px-2.5 py-1 text-xs font-medium text-[#D97706]">
+              {pendingReports.length} pending
+            </span>
+          )}
+        </div>
+        <div className="mt-3 space-y-2">
+          {pendingReports.length === 0 ? (
+            <Card className="p-5 text-sm text-muted">No reports waiting on review right now.</Card>
+          ) : (
+            pendingReports.map((report) => (
+              <PendingReportCard key={report.id} report={report} onReview={setReviewingReport} />
+            ))
+          )}
+        </div>
+      </section>
+
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section>
           <div className="flex items-center justify-between">
@@ -185,6 +244,15 @@ export function Dashboard() {
           </div>
         </section>
       </div>
+
+      {reviewingReport && (
+        <ReportReviewModal
+          report={reviewingReport}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onClose={() => setReviewingReport(null)}
+        />
+      )}
     </PageContainer>
   )
 }

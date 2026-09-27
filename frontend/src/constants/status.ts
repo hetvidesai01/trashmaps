@@ -16,9 +16,10 @@ export const CITIZEN_SOURCE_COLOR = 'var(--color-status-citizen)'
 
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   pending_verification: 'Pending verification',
-  verified_active: 'Verified',
+  verified_active: 'Verified / active',
   included_in_route: 'Included in route',
   resolved: 'Resolved',
+  rejected: 'Rejected',
 }
 
 export const REPORT_STATUS_COLOR: Record<ReportStatus, string> = {
@@ -26,4 +27,5 @@ export const REPORT_STATUS_COLOR: Record<ReportStatus, string> = {
   verified_active: 'var(--color-status-citizen)',
   included_in_route: 'var(--color-status-collected)',
   resolved: 'var(--color-status-skipped)',
+  rejected: 'var(--color-status-skipped)',
 }

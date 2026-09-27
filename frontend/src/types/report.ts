@@ -3,6 +3,7 @@ export type ReportStatus =
   | 'verified_active'
   | 'included_in_route'
   | 'resolved'
+  | 'rejected'
 
 export type ReportSeverity = 'low' | 'medium' | 'high'
 

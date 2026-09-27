@@ -1,10 +1,12 @@
-import type { DashboardStats } from '../../types'
-import { mockCollectionPoints } from './collectionPoints'
+import type { CollectionPoint, DashboardStats } from '../../types'
 
-export const mockDashboardStats: DashboardStats = {
-  pointsOnRouteToday: mockCollectionPoints.length,
-  requiringCollection: mockCollectionPoints.filter((point) => point.status === 'pending').length,
-  skipped: mockCollectionPoints.filter((point) => point.status === 'skipped').length,
-  citizenAdded: mockCollectionPoints.filter((point) => point.source === 'citizen').length,
-  collectedToday: mockCollectionPoints.filter((point) => point.status === 'collected').length,
+/** Recomputed from live point state on every call — never a cached snapshot. */
+export function buildDashboardStats(points: CollectionPoint[]): DashboardStats {
+  return {
+    pointsOnRouteToday: points.length,
+    requiringCollection: points.filter((point) => point.status === 'pending').length,
+    skipped: points.filter((point) => point.status === 'skipped').length,
+    citizenAdded: points.filter((point) => point.source === 'citizen').length,
+    collectedToday: points.filter((point) => point.status === 'collected').length,
+  }
 }

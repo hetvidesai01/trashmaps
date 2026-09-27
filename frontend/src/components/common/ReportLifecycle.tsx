@@ -1,3 +1,4 @@
+import { CircleSlash2 } from 'lucide-react'
 import type { ReportStatus } from '../../types'
 
 const STAGES: { status: ReportStatus; label: string }[] = [
@@ -12,6 +13,17 @@ interface ReportLifecycleProps {
 }
 
 export function ReportLifecycle({ status }: ReportLifecycleProps) {
+  // Rejected is a terminal branch off the pipeline, not a step within it —
+  // it never advances toward becoming a CollectionPoint.
+  if (status === 'rejected') {
+    return (
+      <div className="flex items-center gap-2 text-xs text-muted">
+        <CircleSlash2 size={14} />
+        Rejected — this report will not be added to a collection route.
+      </div>
+    )
+  }
+
   const currentIndex = STAGES.findIndex((stage) => stage.status === status)
 
   return (

@@ -1,6 +1,9 @@
 import type { CitizenReport, SubmitReportInput } from '../../types'
+import { loadFromStorage, saveToStorage } from './storage'
 
-export const mockCitizenReports: CitizenReport[] = [
+const STORAGE_KEY = 'trashmaps.citizenReports'
+
+const seedCitizenReports: CitizenReport[] = [
   {
     id: 'CR-501',
     reportedBy: 'Ananya Deshpande',
@@ -66,7 +69,26 @@ export const mockCitizenReports: CitizenReport[] = [
     status: 'resolved',
     reportedAt: '2026-09-20T09:00:00+05:30',
   },
+  {
+    id: 'CR-506',
+    reportedBy: 'Vikram Joshi',
+    address: 'Near Bandra Reclamation',
+    latitude: 19.0480,
+    longitude: 72.8210,
+    category: 'Other',
+    description: 'One-off pile of garden waste, not a recurring problem.',
+    imageUrl: null,
+    severity: 'low',
+    status: 'rejected',
+    reportedAt: '2026-09-25T14:00:00+05:30',
+  },
 ]
+
+export const mockCitizenReports: CitizenReport[] = loadFromStorage(STORAGE_KEY, seedCitizenReports)
+
+function persist() {
+  saveToStorage(STORAGE_KEY, mockCitizenReports)
+}
 
 /**
  * Appends a new citizen report to the in-memory mock store, always starting
@@ -82,5 +104,24 @@ export function createCitizenReport(input: SubmitReportInput): CitizenReport {
     ...input,
   }
   mockCitizenReports.push(report)
+  persist()
+  return report
+}
+
+/** Marks a report verified/active. Does NOT create the CollectionPoint — see services/api/citizenReports.ts. */
+export function markReportVerified(reportId: string): CitizenReport {
+  const report = mockCitizenReports.find((item) => item.id === reportId)
+  if (!report) throw new Error(`Unknown report: ${reportId}`)
+  report.status = 'verified_active'
+  persist()
+  return report
+}
+
+/** Marks a report rejected — it is kept for history, never linked to a CollectionPoint. */
+export function markReportRejected(reportId: string): CitizenReport {
+  const report = mockCitizenReports.find((item) => item.id === reportId)
+  if (!report) throw new Error(`Unknown report: ${reportId}`)
+  report.status = 'rejected'
+  persist()
   return report
 }

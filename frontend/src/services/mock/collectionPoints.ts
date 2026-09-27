@@ -1,6 +1,9 @@
-import type { CollectionPoint } from '../../types'
+import type { CitizenReport, CollectionPoint } from '../../types'
+import { loadFromStorage, saveToStorage } from './storage'
 
-export const mockCollectionPoints: CollectionPoint[] = [
+const STORAGE_KEY = 'trashmaps.collectionPoints'
+
+const seedCollectionPoints: CollectionPoint[] = [
   {
     id: 'CP-101',
     address: 'Linking Road, Bandra West',
@@ -122,3 +125,32 @@ export const mockCollectionPoints: CollectionPoint[] = [
     linkedReportId: 'CR-502',
   },
 ]
+
+export const mockCollectionPoints: CollectionPoint[] = loadFromStorage(STORAGE_KEY, seedCollectionPoints)
+
+function persist() {
+  saveToStorage(STORAGE_KEY, mockCollectionPoints)
+}
+
+/**
+ * Creates the CollectionPoint a verified CitizenReport links to. The report
+ * itself is never converted in place — this is a new, separate record that
+ * merely references the report via linkedReportId.
+ */
+export function createCollectionPointFromReport(report: CitizenReport): CollectionPoint {
+  const point: CollectionPoint = {
+    id: `CP-${101 + mockCollectionPoints.length}`,
+    address: report.address,
+    latitude: report.latitude,
+    longitude: report.longitude,
+    existingRouteId: null,
+    requiresCollection: true,
+    status: 'pending',
+    lastCollected: null,
+    source: 'citizen',
+    linkedReportId: report.id,
+  }
+  mockCollectionPoints.push(point)
+  persist()
+  return point
+}
