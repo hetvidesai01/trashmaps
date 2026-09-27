@@ -24,6 +24,12 @@ export function getCurrentRoute(): Promise<CollectionRoute> {
   return resolveAfterDelay(current)
 }
 
+/** Facade for the future GET /api/routes/existing/:routeId. */
+export function getExistingRoute(routeId: string): Promise<CollectionRoute | null> {
+  const route = buildCollectionRoutes(mockCollectionPoints).find((item) => item.routeId === routeId) ?? null
+  return resolveAfterDelay(route)
+}
+
 /**
  * Facade for the future `POST /api/routes/optimize`. Everything here is
  * backed by the mock optimizer in services/mock/routeOptimizer.ts — swap this

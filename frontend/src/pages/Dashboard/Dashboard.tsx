@@ -213,17 +213,21 @@ export function Dashboard() {
             </Link>
           </div>
           <div className="mt-3 space-y-2">
-            {activePoints.map((point) => (
-              <Card key={point.id} className="flex items-center justify-between gap-3 p-3.5">
-                <div>
-                  <p className="text-sm font-medium text-ink">{point.address}</p>
-                  <p className="text-xs text-muted">
-                    {point.source === 'citizen' ? 'Citizen report' : `Route ${point.existingRouteId}`}
-                  </p>
-                </div>
-                <StatusBadge status={point.status} citizenReported={point.source === 'citizen'} />
-              </Card>
-            ))}
+            {activePoints.length === 0 ? (
+              <Card className="p-5 text-sm text-muted">No points currently need collection.</Card>
+            ) : (
+              activePoints.map((point) => (
+                <Card key={point.id} className="flex items-center justify-between gap-3 p-3.5">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{point.address}</p>
+                    <p className="text-xs text-muted">
+                      {point.source === 'citizen' ? 'Citizen report' : `Route ${point.existingRouteId}`}
+                    </p>
+                  </div>
+                  <StatusBadge status={point.status} citizenReported={point.source === 'citizen'} />
+                </Card>
+              ))
+            )}
           </div>
         </section>
 

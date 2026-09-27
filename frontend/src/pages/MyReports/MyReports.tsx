@@ -7,7 +7,7 @@ import { getCitizenReports } from '../../services/api'
 import { formatDateTime } from '../../utils/format'
 
 export function MyReports() {
-  const { data: reports } = useAsyncData(getCitizenReports)
+  const { data: reports, isLoading } = useAsyncData(getCitizenReports)
 
   return (
     <PageContainer className="max-w-2xl">
@@ -15,6 +15,14 @@ export function MyReports() {
         <h1 className="font-display text-2xl font-semibold text-ink">My reports</h1>
         <p className="mt-1 text-sm text-muted">Waste reports you&rsquo;ve submitted and their review status.</p>
       </header>
+
+      {isLoading && <p className="mt-6 text-sm text-muted">Loading your reports&hellip;</p>}
+
+      {!isLoading && reports?.length === 0 && (
+        <Card className="mt-6 p-6 text-center text-sm text-muted">
+          You haven&rsquo;t submitted any reports yet.
+        </Card>
+      )}
 
       <div className="mt-6 space-y-4">
         {reports?.map((report) => (

@@ -1,7 +1,7 @@
 import type { CitizenReport, SubmitReportInput } from '../../types'
-import { loadFromStorage, saveToStorage } from './storage'
+import { loadFromStorage, saveToStorage, STORAGE_KEYS } from './storage'
 
-const STORAGE_KEY = 'trashmaps.citizenReports'
+const STORAGE_KEY = STORAGE_KEYS.citizenReports
 
 const seedCitizenReports: CitizenReport[] = [
   {

@@ -1,11 +1,28 @@
+import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import { LayoutDashboard, Route as RouteIcon, Map, MessageSquarePlus, ClipboardList, ArrowUpRight } from 'lucide-react'
-import { Button } from '../../components/common/Button'
+import {
+  LayoutDashboard,
+  Route as RouteIcon,
+  Map,
+  MessageSquarePlus,
+  ClipboardList,
+  ArrowUpRight,
+  ArrowRight,
+  ChevronRight,
+} from 'lucide-react'
 import { Card } from '../../components/common/Card'
 import { PageContainer } from '../../components/layout/PageContainer'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getDashboardStats } from '../../services/api'
 import { RouteArt } from './RouteArt'
+
+const FLOW_STEPS = [
+  'Existing route',
+  'Detect required stops',
+  'Add verified citizen reports',
+  'Optimize route',
+  'Collect',
+]
 
 const OPERATIONAL_FEATURES = [
   {
@@ -48,12 +65,26 @@ export function Home() {
             a pickup today, folds in verified citizen reports, and hands the active set to your
             route optimizer.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/dashboard">
-              <Button variant="primary">Open dashboard</Button>
+          <div className="mt-8 grid max-w-md grid-cols-2 gap-3">
+            <Link
+              to="/dashboard"
+              className="rounded-lg border border-ink/10 bg-surface p-4 transition-colors hover:border-primary/40"
+            >
+              <p className="text-xs text-muted">For authorities</p>
+              <p className="mt-1 flex items-center gap-1.5 font-medium text-ink">
+                Operations dashboard
+                <ArrowRight size={14} className="text-primary-dark" />
+              </p>
             </Link>
-            <Link to="/map">
-              <Button variant="secondary">Explore waste map</Button>
+            <Link
+              to="/report"
+              className="rounded-lg border border-ink/10 bg-surface p-4 transition-colors hover:border-primary/40"
+            >
+              <p className="text-xs text-muted">For citizens</p>
+              <p className="mt-1 flex items-center gap-1.5 font-medium text-ink">
+                Report waste
+                <ArrowRight size={14} className="text-primary-dark" />
+              </p>
             </Link>
           </div>
 
@@ -83,6 +114,19 @@ export function Home() {
 
         <Card className="flex h-72 items-center justify-center p-6 lg:h-80">
           <RouteArt />
+        </Card>
+      </section>
+
+      <section className="pb-8">
+        <Card className="flex flex-wrap items-center gap-x-2 gap-y-2 px-5 py-4">
+          {FLOW_STEPS.map((step, index) => (
+            <Fragment key={step}>
+              <span className="text-sm font-medium text-ink">{step}</span>
+              {index < FLOW_STEPS.length - 1 && (
+                <ChevronRight size={14} className="shrink-0 text-muted" />
+              )}
+            </Fragment>
+          ))}
         </Card>
       </section>
 

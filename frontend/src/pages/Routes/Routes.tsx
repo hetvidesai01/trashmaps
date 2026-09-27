@@ -12,7 +12,7 @@ import { ActiveCollectionSet } from '../../components/routes/ActiveCollectionSet
 import { RouteComparisonView } from '../../components/routes/RouteComparisonView'
 import { CollectionProgressBar } from '../../components/routes/CollectionProgressBar'
 import { RouteStopList } from '../../components/routes/RouteStopList'
-import { getCollectionRoutes, getCitizenReports, optimizeRoute } from '../../services/api'
+import { getCollectionRoutes, getCitizenReports, optimizeRoute, updateCollectionPointStatus } from '../../services/api'
 import { formatPercent } from '../../utils/format'
 import type { CitizenReport, CollectionPoint, CollectionRoute } from '../../types'
 
@@ -40,6 +40,7 @@ export function Routes() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null)
   const [isOptimizing, setIsOptimizing] = useState(false)
+  const [optimizeError, setOptimizeError] = useState<string | null>(null)
 
   useEffect(() => {
     getCollectionRoutes().then((data) => {
@@ -82,28 +83,37 @@ export function Routes() {
   async function handleOptimize() {
     if (!selectedRoute) return
     setIsOptimizing(true)
-    const result = await optimizeRoute(selectedRoute, remainingActiveStops)
-    setRoutes(
-      (prev) =>
-        prev?.map((route) =>
-          route.routeId === selectedRoute.routeId
-            ? {
-                ...route,
-                optimizedStops: result.optimizedStops,
-                totalDistance: result.totalDistance,
-                estimatedTime: result.estimatedTime,
-                distanceSaved: result.distanceSaved,
-                timeSaved: result.timeSaved,
-                generatedAt: result.generatedAt,
-              }
-            : route,
-        ) ?? prev,
-    )
-    setIsOptimizing(false)
+    setOptimizeError(null)
+    try {
+      const result = await optimizeRoute(selectedRoute, remainingActiveStops)
+      setRoutes(
+        (prev) =>
+          prev?.map((route) =>
+            route.routeId === selectedRoute.routeId
+              ? {
+                  ...route,
+                  optimizedStops: result.optimizedStops,
+                  totalDistance: result.totalDistance,
+                  estimatedTime: result.estimatedTime,
+                  distanceSaved: result.distanceSaved,
+                  timeSaved: result.timeSaved,
+                  generatedAt: result.generatedAt,
+                }
+              : route,
+          ) ?? prev,
+      )
+    } catch {
+      setOptimizeError('Optimization failed. Please try again.')
+    } finally {
+      setIsOptimizing(false)
+    }
   }
 
   function handleMarkCollected(pointId: string) {
     if (!selectedRoute) return
+    // Update the shared store so Dashboard/Waste Map see this on their next
+    // fetch, and apply the same change locally for instant feedback here.
+    updateCollectionPointStatus(pointId, 'collected')
     setRoutes(
       (prev) =>
         prev?.map((route) => (route.routeId === selectedRoute.routeId ? markCollected(route, pointId) : route)) ??
@@ -149,11 +159,16 @@ export function Routes() {
             onSelectRoute={(routeId) => {
               setSelectedRouteId(routeId)
               setSelectedPointId(null)
+              setOptimizeError(null)
             }}
             onOptimize={handleOptimize}
             isOptimizing={isOptimizing}
             remainingActiveCount={remainingActiveStops.length}
           />
+
+          {optimizeError && (
+            <p className="rounded-lg bg-[#D97706]/10 px-3 py-2.5 text-sm text-[#D97706]">{optimizeError}</p>
+          )}
 
           <ActiveCollectionSet
             routePointCount={remainingRoutePoints}

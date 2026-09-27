@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Map, Route as RouteIcon, MessageSquarePlus, ClipboardList, Menu, X, Trash2 } from 'lucide-react'
 import { PRIMARY_NAV, SECONDARY_NAV } from '../../constants/nav'
+import { ResetDemoButton } from './ResetDemoButton'
 
 const PRIMARY_ICONS = [LayoutDashboard, RouteIcon, Map]
 const SECONDARY_ICONS = [MessageSquarePlus, ClipboardList]
@@ -68,6 +69,10 @@ export function Navbar() {
               )
             })}
           </ul>
+
+          <div className="relative ml-2">
+            <ResetDemoButton />
+          </div>
         </nav>
 
         <button
@@ -125,6 +130,10 @@ export function Navbar() {
               )
             })}
           </ul>
+
+          <div className="relative mt-3 border-t border-white/10 pt-3">
+            <ResetDemoButton iconColorClassName="text-white/40" />
+          </div>
         </nav>
       )}
     </header>

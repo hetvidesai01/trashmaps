@@ -86,6 +86,11 @@ export function WasteMap() {
             routes?.map((route) => <RouteLayer key={route.routeId} route={route} variant="original" />)}
         </MapView>
         <PointStatusLegend />
+        {points && points.length > 0 && filteredPoints.length === 0 && (
+          <div className="absolute inset-x-0 top-4 z-[400] mx-auto w-fit rounded-lg border border-ink/10 bg-surface/95 px-4 py-2 text-sm text-muted shadow-lg backdrop-blur">
+            No collection points match your filters.
+          </div>
+        )}
         {selectedPoint && (
           <PointDetailPanel
             point={selectedPoint}

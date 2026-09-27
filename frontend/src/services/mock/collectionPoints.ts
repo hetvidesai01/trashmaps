@@ -1,7 +1,7 @@
 import type { CitizenReport, CollectionPoint } from '../../types'
-import { loadFromStorage, saveToStorage } from './storage'
+import { loadFromStorage, saveToStorage, STORAGE_KEYS } from './storage'
 
-const STORAGE_KEY = 'trashmaps.collectionPoints'
+const STORAGE_KEY = STORAGE_KEYS.collectionPoints
 
 const seedCollectionPoints: CollectionPoint[] = [
   {
@@ -128,6 +128,10 @@ const seedCollectionPoints: CollectionPoint[] = [
 
 export const mockCollectionPoints: CollectionPoint[] = loadFromStorage(STORAGE_KEY, seedCollectionPoints)
 
+export function findCollectionPoint(pointId: string): CollectionPoint | null {
+  return mockCollectionPoints.find((point) => point.id === pointId) ?? null
+}
+
 function persist() {
   saveToStorage(STORAGE_KEY, mockCollectionPoints)
 }
@@ -151,6 +155,26 @@ export function createCollectionPointFromReport(report: CitizenReport): Collecti
     linkedReportId: report.id,
   }
   mockCollectionPoints.push(point)
+  persist()
+  return point
+}
+
+/**
+ * Updates a point's status in the one shared array every page reads from —
+ * so marking a stop collected on Routes is immediately reflected on
+ * Dashboard and the Waste Map too, not just in that page's local session.
+ */
+export function updateCollectionPointStatus(
+  pointId: string,
+  status: CollectionPoint['status'],
+): CollectionPoint {
+  const point = mockCollectionPoints.find((item) => item.id === pointId)
+  if (!point) throw new Error(`Unknown collection point: ${pointId}`)
+
+  point.status = status
+  point.requiresCollection = status === 'pending'
+  if (status === 'collected') point.lastCollected = new Date().toISOString()
+
   persist()
   return point
 }
