@@ -20,8 +20,23 @@ const CHECK_CIRCLE = (color: string) =>
 const DIAMOND_HTML = (color: string) =>
   `<span style="display:block;width:12px;height:12px;transform:rotate(45deg);background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`
 
-export function pointIcon(point: CollectionPoint) {
+// Numbered variants — used for stops in the currently optimized sequence.
+const NUMBERED_CIRCLE = (color: string, order: number) =>
+  `<span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:9999px;background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);color:white;font:700 10px/1 Inter,sans-serif">${order}</span>`
+
+const NUMBERED_DIAMOND = (color: string, order: number) =>
+  `<span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;transform:rotate(45deg);background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"><span style="display:block;transform:rotate(-45deg);color:white;font:700 9px/1 Inter,sans-serif">${order}</span></span>`
+
+export function pointIcon(point: CollectionPoint, orderLabel?: number) {
   if (point.source === 'citizen') {
+    if (orderLabel != null) {
+      return divIcon({
+        className: '',
+        html: NUMBERED_DIAMOND(CITIZEN_SOURCE_COLOR, orderLabel),
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+      })
+    }
     return divIcon({
       className: '',
       html: DIAMOND_HTML(CITIZEN_SOURCE_COLOR),
@@ -31,6 +46,16 @@ export function pointIcon(point: CollectionPoint) {
   }
 
   const color = STATUS_COLOR[point.status]
+
+  if (orderLabel != null) {
+    return divIcon({
+      className: '',
+      html: NUMBERED_CIRCLE(color, orderLabel),
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    })
+  }
+
   const html =
     point.status === 'skipped'
       ? FADED_RING(color)

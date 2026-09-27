@@ -13,21 +13,23 @@ interface CollectionPointMarkerProps {
    * (used for the lightweight Dashboard map preview).
    */
   onSelect?: (point: CollectionPoint) => void
+  /** Stop number within the currently optimized sequence, if any. */
+  orderLabel?: number
 }
 
-export function CollectionPointMarker({ point, onSelect }: CollectionPointMarkerProps) {
+export function CollectionPointMarker({ point, onSelect, orderLabel }: CollectionPointMarkerProps) {
   if (onSelect) {
     return (
       <Marker
         position={[point.latitude, point.longitude]}
-        icon={pointIcon(point)}
+        icon={pointIcon(point, orderLabel)}
         eventHandlers={{ click: () => onSelect(point) }}
       />
     )
   }
 
   return (
-    <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point)}>
+    <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel)}>
       <Popup>
         <div className="min-w-[200px] space-y-1.5">
           <p className="text-sm font-medium text-ink">{point.address}</p>

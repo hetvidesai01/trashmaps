@@ -4,7 +4,12 @@ const requiresColor = STATUS_COLOR.pending
 const skippedColor = STATUS_COLOR.skipped
 const collectedColor = STATUS_COLOR.collected
 
-export function PointStatusLegend() {
+interface PointStatusLegendProps {
+  /** Show the "Optimized route" line entry — only relevant once one exists. */
+  showOptimized?: boolean
+}
+
+export function PointStatusLegend({ showOptimized = false }: PointStatusLegendProps) {
   return (
     <div className="absolute bottom-4 left-4 z-[400] rounded-lg border border-ink/10 bg-surface/95 px-4 py-3 shadow-lg backdrop-blur">
       <p className="text-xs font-semibold text-muted">Legend</p>
@@ -44,6 +49,12 @@ export function PointStatusLegend() {
           />
           Original route
         </li>
+        {showOptimized && (
+          <li className="flex items-center gap-2 text-xs text-ink">
+            <span className="h-0 w-4 border-t-[3px]" style={{ borderColor: 'var(--color-primary)' }} />
+            Optimized route
+          </li>
+        )}
       </ul>
     </div>
   )
