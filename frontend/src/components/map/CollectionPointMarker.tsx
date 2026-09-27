@@ -6,9 +6,26 @@ import type { CollectionPoint } from '../../types'
 
 interface CollectionPointMarkerProps {
   point: CollectionPoint
+  /**
+   * When provided, the marker calls this on click instead of opening its own
+   * popup — the caller is expected to render a PointDetailPanel for the
+   * selected point (used on the Waste Map). Omit to keep the built-in popup
+   * (used for the lightweight Dashboard map preview).
+   */
+  onSelect?: (point: CollectionPoint) => void
 }
 
-export function CollectionPointMarker({ point }: CollectionPointMarkerProps) {
+export function CollectionPointMarker({ point, onSelect }: CollectionPointMarkerProps) {
+  if (onSelect) {
+    return (
+      <Marker
+        position={[point.latitude, point.longitude]}
+        icon={pointIcon(point)}
+        eventHandlers={{ click: () => onSelect(point) }}
+      />
+    )
+  }
+
   return (
     <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point)}>
       <Popup>
