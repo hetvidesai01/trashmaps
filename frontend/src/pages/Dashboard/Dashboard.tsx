@@ -1,97 +1,185 @@
 import { Link } from 'react-router-dom'
+import {
+  MapPin,
+  AlertTriangle,
+  CircleSlash2,
+  MessageSquarePlus,
+  CheckCircle2,
+  Truck,
+  Clock,
+  ArrowRight,
+} from 'lucide-react'
 import { Card } from '../../components/common/Card'
+import { Button } from '../../components/common/Button'
+import { StatCard } from '../../components/common/StatCard'
 import { StatusBadge } from '../../components/common/StatusBadge'
 import { CollectionProgressBar } from '../../components/routes/CollectionProgressBar'
 import { PageContainer } from '../../components/layout/PageContainer'
+import { MapView } from '../../components/map/MapView'
+import { CollectionPointMarker } from '../../components/map/CollectionPointMarker'
+import { DepotMarker } from '../../components/map/DepotMarker'
+import { RouteLayer } from '../../components/map/RouteLayer'
+import { PointStatusLegend } from '../../components/map/PointStatusLegend'
 import { useAsyncData } from '../../hooks/useAsyncData'
-import { getCollectionRoutes, getCitizenReports, getDashboardStats } from '../../services/api'
+import {
+  getCollectionPoints,
+  getCurrentRoute,
+  getDashboardStats,
+  getRecentActivity,
+} from '../../services/api'
 import { formatDateTime } from '../../utils/format'
+
+const TODAY_LABEL = new Date().toLocaleDateString('en-IN', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+})
 
 export function Dashboard() {
   const { data: stats } = useAsyncData(getDashboardStats)
-  const { data: routes } = useAsyncData(getCollectionRoutes)
-  const { data: reports } = useAsyncData(getCitizenReports)
+  const { data: points } = useAsyncData(getCollectionPoints)
+  const { data: route } = useAsyncData(getCurrentRoute)
+  const { data: activity } = useAsyncData(getRecentActivity)
+
+  const activePoints = points?.filter((point) => point.status === 'pending').slice(0, 5) ?? []
+  const completedStops = route?.originalStops.filter((point) => point.status === 'collected').length ?? 0
 
   return (
-    <PageContainer>
-      <header>
-        <h1 className="font-display text-2xl font-semibold text-ink">Operations dashboard</h1>
-        <p className="mt-1 text-sm text-muted">The operational home base for today&rsquo;s collection run.</p>
+    <PageContainer className="max-w-7xl">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink">Operations dashboard</h1>
+          <p className="mt-1 max-w-lg text-sm text-muted">
+            Monitor today&rsquo;s collection network and optimize where your vehicles actually
+            need to go.
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <span className="text-xs text-muted">{TODAY_LABEL}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary-dark">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            Route active
+          </span>
+        </div>
       </header>
 
       {stats && (
-        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
-          <Card className="p-5">
-            <p className="text-xs text-muted">On route today</p>
-            <p className="mt-2 font-display text-3xl font-semibold text-ink">{stats.pointsOnRouteToday}</p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs text-muted">Requiring collection</p>
-            <p className="mt-2 font-display text-3xl font-semibold text-[#D97706]">
-              {stats.requiringCollection}
-            </p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs text-muted">Skipped</p>
-            <p className="mt-2 font-display text-3xl font-semibold text-[#9CA3AF]">{stats.skipped}</p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs text-muted">Citizen-added</p>
-            <p className="mt-2 font-display text-3xl font-semibold text-[#7C3AED]">
-              {stats.citizenAdded}
-            </p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs text-muted">Collected</p>
-            <p className="mt-2 font-display text-3xl font-semibold text-primary">
-              {stats.collectedToday}
-            </p>
-          </Card>
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <StatCard icon={MapPin} label="On route today" value={stats.pointsOnRouteToday} accentColor="#1E1E1E" />
+          <StatCard
+            icon={AlertTriangle}
+            label="Requiring collection"
+            value={stats.requiringCollection}
+            accentColor="#D97706"
+          />
+          <StatCard icon={CircleSlash2} label="Skipped" value={stats.skipped} accentColor="#9CA3AF" />
+          <StatCard
+            icon={MessageSquarePlus}
+            label="Citizen-added"
+            value={stats.citizenAdded}
+            accentColor="#7C3AED"
+          />
+          <StatCard icon={CheckCircle2} label="Collected" value={stats.collectedToday} accentColor="#1E7A4C" />
         </div>
       )}
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <Card className="relative h-[420px] overflow-hidden lg:h-[480px]">
+          <MapView>
+            {points?.map((point) => (
+              <CollectionPointMarker key={point.id} point={point} />
+            ))}
+            {route && <DepotMarker depot={route.depot} />}
+            {route && <RouteLayer route={route} variant="original" />}
+          </MapView>
+          <PointStatusLegend />
+        </Card>
+
+        <Card className="p-5">
+          <h2 className="font-display text-lg font-semibold text-ink">Current collection</h2>
+          {route ? (
+            <div className="mt-4 space-y-4">
+              <div>
+                <p className="font-medium text-ink">{route.name}</p>
+                <p className="text-xs text-muted">{route.routeId}</p>
+              </div>
+
+              <dl className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <dt className="flex items-center gap-1.5 text-muted">
+                    <Truck size={14} />
+                    Vehicle
+                  </dt>
+                  <dd className="text-ink">{route.vehicle}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Depot</dt>
+                  <dd className="text-ink">{route.depot.name}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Scheduled points</dt>
+                  <dd className="text-ink">{route.originalStops.length}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Required stops</dt>
+                  <dd className="text-ink">{route.activeStops.length}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Completed stops</dt>
+                  <dd className="text-ink">{completedStops}</dd>
+                </div>
+              </dl>
+
+              <CollectionProgressBar progress={route.collectionProgress} label="Collection progress" />
+
+              <Link to="/routes">
+                <Button className="w-full justify-center">
+                  View &amp; optimize route
+                  <ArrowRight size={15} />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-muted">Loading current route&hellip;</p>
+          )}
+        </Card>
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section>
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold text-ink">Active routes</h2>
-            <Link to="/routes" className="text-sm font-medium text-primary-dark hover:underline">
-              View all
+            <h2 className="font-display text-lg font-semibold text-ink">Active collection points</h2>
+            <Link to="/map" className="text-sm font-medium text-primary-dark hover:underline">
+              View all on map
             </Link>
           </div>
-          <div className="mt-3 space-y-3">
-            {routes?.map((route) => (
-              <Card key={route.routeId} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-ink">{route.name}</p>
-                    <p className="text-xs text-muted">
-                      {route.activeStops.length} of {route.originalStops.length} stops active
-                    </p>
-                  </div>
+          <div className="mt-3 space-y-2">
+            {activePoints.map((point) => (
+              <Card key={point.id} className="flex items-center justify-between gap-3 p-3.5">
+                <div>
+                  <p className="text-sm font-medium text-ink">{point.address}</p>
+                  <p className="text-xs text-muted">
+                    {point.source === 'citizen' ? 'Citizen report' : `Route ${point.existingRouteId}`}
+                  </p>
                 </div>
-                <div className="mt-3">
-                  <CollectionProgressBar progress={route.collectionProgress} />
-                </div>
+                <StatusBadge status={point.status} citizenReported={point.source === 'citizen'} />
               </Card>
             ))}
           </div>
         </section>
 
         <section>
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold text-ink">Citizen reports</h2>
-            <Link to="/my-reports" className="text-sm font-medium text-primary-dark hover:underline">
-              View all
-            </Link>
-          </div>
-          <div className="mt-3 space-y-3">
-            {reports?.map((report) => (
-              <Card key={report.id} className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium text-ink">{report.category}</p>
-                  <StatusBadge reportStatus={report.status} />
+          <h2 className="font-display text-lg font-semibold text-ink">Recent activity</h2>
+          <div className="mt-3 space-y-2">
+            {activity?.map((event) => (
+              <Card key={event.id} className="flex items-start gap-3 p-3.5">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary-dark">
+                  <Clock size={13} />
+                </span>
+                <div>
+                  <p className="text-sm text-ink">{event.message}</p>
+                  <p className="mt-0.5 text-xs text-muted">{formatDateTime(event.timestamp)}</p>
                 </div>
-                <p className="mt-1 text-xs text-muted">{formatDateTime(report.reportedAt)}</p>
               </Card>
             ))}
           </div>

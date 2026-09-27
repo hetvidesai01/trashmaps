@@ -9,6 +9,7 @@ export interface Depot {
 export interface CollectionRoute {
   routeId: string
   name: string
+  vehicle: string
   depot: Depot
   originalStops: CollectionPoint[]
   activeStops: CollectionPoint[]

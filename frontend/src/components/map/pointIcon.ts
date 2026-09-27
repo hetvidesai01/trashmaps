@@ -25,3 +25,14 @@ export function pointIcon(point: CollectionPoint) {
     iconAnchor: [7, 7],
   })
 }
+
+const HOME_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>`
+
+export function depotIcon() {
+  return divIcon({
+    className: '',
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:#145C38;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)">${HOME_SVG}</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  })
+}
