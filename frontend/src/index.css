@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  --color-primary: #1e7a4c;
+  --color-primary-dark: #145c38;
+  --color-accent: #8bc34a;
+  --color-bg: #f7f9f7;
+  --color-surface: #ffffff;
+  --color-ink: #1e1e1e;
+  --color-muted: #6b7280;
+
+  --color-status-requires: #d97706;
+  --color-status-skipped: #9ca3af;
+  --color-status-collected: #1e7a4c;
+  --color-status-citizen: #7c3aed;
+
+  --radius-card: 0.875rem;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

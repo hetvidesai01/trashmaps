@@ -1,0 +1,40 @@
+import type { CitizenReport } from '../../types'
+
+export const mockCitizenReports: CitizenReport[] = [
+  {
+    id: 'CR-501',
+    reportedBy: 'Ananya Deshpande',
+    latitude: 18.5613,
+    longitude: 73.7801,
+    category: 'Overflowing bin',
+    description: 'Overflowing bin near the depot gate, uncollected for 3 days.',
+    imageUrl: null,
+    severity: 'high',
+    status: 'verified_active',
+    reportedAt: '2026-09-26T18:22:00+05:30',
+  },
+  {
+    id: 'CR-502',
+    reportedBy: 'Rohit Kulkarni',
+    latitude: 18.5411,
+    longitude: 73.7981,
+    category: 'Illegal dumping',
+    description: 'Construction debris and household waste dumped on the footpath.',
+    imageUrl: null,
+    severity: 'medium',
+    status: 'verified_active',
+    reportedAt: '2026-09-27T08:05:00+05:30',
+  },
+  {
+    id: 'CR-503',
+    reportedBy: 'Fatima Shaikh',
+    latitude: 18.5967,
+    longitude: 73.7658,
+    category: 'Loose litter',
+    description: 'Loose garbage scattered after a bin was knocked over.',
+    imageUrl: null,
+    severity: 'low',
+    status: 'pending_verification',
+    reportedAt: '2026-09-27T09:40:00+05:30',
+  },
+]
