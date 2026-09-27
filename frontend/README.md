@@ -1,32 +1,52 @@
-# React + TypeScript + Vite
+# TrashMaps
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+TrashMaps dynamically optimizes existing municipal waste-collection routes:
+it identifies which predefined stops actually need a pickup today, skips the
+ones that don't, folds in verified citizen-reported points, and sends that
+active set to a route optimizer. Citizen waste reporting is a supporting
+feature that feeds into this pipeline — it isn't a separate app.
 
-Currently, two official plugins are available:
+This is the frontend only. It runs entirely on an in-memory mock data layer
+(persisted to `localStorage`) — there is no backend yet.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+React + TypeScript + Vite, Tailwind CSS, React Router, React Leaflet +
+OpenStreetMap, Lucide icons.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Install & run
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # start the dev server
+npm run build    # production build
+npm run lint     # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Copy `.env.example` to `.env` if you want `VITE_API_BASE_URL` set locally —
+it's currently unused, since every request is served by the mock layer.
+
+## Project structure
+
+```
+src/
+  components/   # common/, layout/, map/, routes/, forms/, reports/ — shared UI
+  pages/        # one folder per route (Home, Dashboard, WasteMap, Routes, ReportWaste, MyReports)
+  services/
+    api/        # the facade every page calls — this is what a real backend replaces
+    mock/       # today's implementation of that facade (in-memory + localStorage)
+  types/        # CollectionPoint, CitizenReport, CollectionRoute, DashboardStats, ...
+  constants/, hooks/, utils/
+```
+
+## Backend integration
+
+This app was built for a backend to be dropped in later without frontend
+changes. Two documents at the repo root cover that:
+
+- **[`API_CONTRACT.md`](../API_CONTRACT.md)** — the endpoint-by-endpoint
+  contract (method, request/response shape, TypeScript types, errors) that
+  `services/api/*` currently fulfills with mock data.
+- **[`BACKEND_HANDOFF.md`](../BACKEND_HANDOFF.md)** — a briefing for whoever
+  implements the backend: what TrashMaps does, the core active-set logic,
+  the citizen-report verification flow, and an integration checklist.

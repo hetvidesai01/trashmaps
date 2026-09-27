@@ -190,6 +190,19 @@ exactly this so the backend should match it.
 
 ---
 
+## `GET /api/routes`
+
+**Purpose**: every route, today. Used by the Routes page (to populate the
+route selector) and the Waste Map (to draw every depot and original-route
+line at once, not just one featured route).
+
+**Frontend function**: `getCollectionRoutes()` in `services/api/routes.ts`
+
+**Response** `200 OK`: `CollectionRoute[]` — same shape as the single-route
+endpoints below, one entry per route.
+
+---
+
 ## `GET /api/routes/existing/:routeId`
 
 **Purpose**: a single route's current state (used by the Routes page when a
@@ -339,6 +352,51 @@ reverse. A rejected report is never deleted; it's kept for history.
 are simple counts over the current `CollectionPoint` set — no separate
 aggregation table is implied; a backend can compute these with a `GROUP BY`
 over the same points table `GET /api/collection-points` reads from.
+
+---
+
+## `GET /api/dashboard/activity`
+
+**Purpose**: the "Recent activity" feed on the Operations Dashboard —
+plain-language log lines like "SV Road, Khar West marked as collected".
+
+**Frontend function**: `getRecentActivity()` in `services/api/activity.ts`
+
+**Response** `200 OK`, sorted newest first:
+
+```json
+[
+  {
+    "id": "AC-1",
+    "type": "report-verified",
+    "message": "Citizen report CR-502 verified and added to the active set at Vakola Bridge Footpath",
+    "timestamp": "2026-09-27T08:30:00+05:30",
+    "pointId": "CP-110"
+  }
+]
+```
+
+**Type**
+
+```ts
+type ActivityEventType = 'collected' | 'skipped' | 'requires-collection' | 'report-verified'
+
+interface ActivityEvent {
+  id: string
+  type: ActivityEventType
+  message: string
+  timestamp: string
+  pointId: string | null
+}
+```
+
+**Note**: today this is static demo data (`services/mock/activity.ts`) — it
+is **not** regenerated when a point's status actually changes elsewhere in
+the app (e.g. marking a stop collected on Routes does not append a new
+activity entry). A real backend should treat this as an actual event log,
+appending an entry whenever a `CollectionPoint` status changes or a report
+is verified, so the feed reflects real activity rather than a fixed demo
+script.
 
 ---
 
