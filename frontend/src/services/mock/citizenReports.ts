@@ -1,9 +1,10 @@
-import type { CitizenReport } from '../../types'
+import type { CitizenReport, SubmitReportInput } from '../../types'
 
 export const mockCitizenReports: CitizenReport[] = [
   {
     id: 'CR-501',
     reportedBy: 'Ananya Deshpande',
+    address: 'Behind Bandra Bus Depot',
     latitude: 19.0570,
     longitude: 72.8310,
     category: 'Overflowing bin',
@@ -16,6 +17,7 @@ export const mockCitizenReports: CitizenReport[] = [
   {
     id: 'CR-502',
     reportedBy: 'Rohit Kulkarni',
+    address: 'Vakola Bridge Footpath, Santacruz',
     latitude: 19.0790,
     longitude: 72.8460,
     category: 'Illegal dumping',
@@ -28,6 +30,7 @@ export const mockCitizenReports: CitizenReport[] = [
   {
     id: 'CR-503',
     reportedBy: 'Fatima Shaikh',
+    address: 'Near Juhu Circle',
     latitude: 19.1010,
     longitude: 72.8280,
     category: 'Loose litter',
@@ -37,4 +40,47 @@ export const mockCitizenReports: CitizenReport[] = [
     status: 'pending_verification',
     reportedAt: '2026-09-27T09:40:00+05:30',
   },
+  {
+    id: 'CR-504',
+    reportedBy: 'Imran Sheikh',
+    address: 'Khar Danda Signal',
+    latitude: 19.0691,
+    longitude: 72.8291,
+    category: 'Overflowing bin',
+    description: 'Bin overflowing onto the footpath near the signal.',
+    imageUrl: null,
+    severity: 'medium',
+    status: 'included_in_route',
+    reportedAt: '2026-09-24T10:15:00+05:30',
+  },
+  {
+    id: 'CR-505',
+    reportedBy: 'Priya Nair',
+    address: 'Carter Road Garden Entrance',
+    latitude: 19.0525,
+    longitude: 72.8251,
+    category: 'Loose litter',
+    description: 'Litter scattered near the garden entrance after the weekend.',
+    imageUrl: null,
+    severity: 'low',
+    status: 'resolved',
+    reportedAt: '2026-09-20T09:00:00+05:30',
+  },
 ]
+
+/**
+ * Appends a new citizen report to the in-memory mock store, always starting
+ * at "pending_verification" — a report only ever becomes eligible to link to
+ * a CollectionPoint once an authority verifies it (a future, separate step).
+ */
+export function createCitizenReport(input: SubmitReportInput): CitizenReport {
+  const report: CitizenReport = {
+    id: `CR-${501 + mockCitizenReports.length}`,
+    reportedBy: 'You',
+    reportedAt: new Date().toISOString(),
+    status: 'pending_verification',
+    ...input,
+  }
+  mockCitizenReports.push(report)
+  return report
+}

@@ -76,3 +76,13 @@ export function depotIcon() {
     iconAnchor: [13, 13],
   })
 }
+
+/** Marker used while a citizen is choosing a report's location on the map. */
+export function citizenPinIcon() {
+  return divIcon({
+    className: '',
+    html: `<span style="display:block;width:18px;height:18px;transform:rotate(45deg);background:${CITIZEN_SOURCE_COLOR};border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></span>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+  })
+}
