@@ -3,13 +3,17 @@ export interface NavItem {
   path: string
 }
 
-export const PRIMARY_NAV: NavItem[] = [
+export const AUTHORITY_PRIMARY_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard' },
-  { label: 'Routes', path: '/routes' },
-  { label: 'Waste Map', path: '/map' },
+  { label: 'Route Operations', path: '/routes' },
+  { label: 'Citizen Reports', path: '/citizen-reports' },
 ]
 
-export const SECONDARY_NAV: NavItem[] = [
+// The waste map stays functional but is secondary now that citizens and
+// authorities have their own dedicated flows — kept out of primary nav.
+export const AUTHORITY_SECONDARY_NAV: NavItem[] = [{ label: 'Waste Map', path: '/map' }]
+
+export const CITIZEN_PRIMARY_NAV: NavItem[] = [
   { label: 'Report Waste', path: '/report' },
   { label: 'My Reports', path: '/my-reports' },
 ]
