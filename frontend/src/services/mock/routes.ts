@@ -69,9 +69,12 @@ function nearestRouteId(point: CollectionPoint): string {
 export function buildCollectionRoutes(points: CollectionPoint[]): CollectionRoute[] {
   return routeSeeds.map((seed) => {
     const originalStops = points.filter((point) => point.existingRouteId === seed.routeId)
-    const routeActive = originalStops.filter((point) => point.requiresCollection)
+    // A stop stays in today's set once collected (so progress and the stop
+    // list stay stable across refreshes); only skipped stops are left out.
+    const inTodaysSet = (point: CollectionPoint) => point.status !== 'skipped'
+    const routeActive = originalStops.filter(inTodaysSet)
     const citizenActive = points.filter(
-      (point) => point.source === 'citizen' && point.requiresCollection && nearestRouteId(point) === seed.routeId,
+      (point) => point.source === 'citizen' && inTodaysSet(point) && nearestRouteId(point) === seed.routeId,
     )
 
     return {

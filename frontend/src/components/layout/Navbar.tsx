@@ -3,7 +3,6 @@ import type { ComponentType } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
-  Map,
   Route as RouteIcon,
   MessageSquarePlus,
   ClipboardList,
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_HOME } from '../../auth/roleHome'
-import { AUTHORITY_PRIMARY_NAV, AUTHORITY_SECONDARY_NAV, CITIZEN_PRIMARY_NAV } from '../../constants/nav'
+import { AUTHORITY_PRIMARY_NAV, CITIZEN_PRIMARY_NAV } from '../../constants/nav'
 import type { NavItem } from '../../constants/nav'
 import { ResetDemoButton } from './ResetDemoButton'
 
@@ -23,7 +22,6 @@ const NAV_ICONS: Record<string, ComponentType<{ size?: number; strokeWidth?: num
   '/dashboard': LayoutDashboard,
   '/routes': RouteIcon,
   '/citizen-reports': ClipboardCheck,
-  '/map': Map,
   '/report': MessageSquarePlus,
   '/my-reports': ClipboardList,
 }
@@ -33,11 +31,6 @@ const primaryLinkClasses = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'text-white' : 'text-white/65 hover:text-white'
   }`
 
-const secondaryLinkClasses = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-1.5 px-2 py-1.5 text-sm transition-colors ${
-    isActive ? 'text-white/90' : 'text-white/45 hover:text-white/75'
-  }`
-
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, role, logout } = useAuth()
@@ -45,7 +38,6 @@ export function Navbar() {
 
   const primaryNav: NavItem[] =
     role === 'authority' ? AUTHORITY_PRIMARY_NAV : role === 'citizen' ? CITIZEN_PRIMARY_NAV : []
-  const secondaryNav: NavItem[] = role === 'authority' ? AUTHORITY_SECONDARY_NAV : []
 
   function handleLogout() {
     logout()
@@ -93,25 +85,6 @@ export function Navbar() {
             </ul>
           )}
 
-          {secondaryNav.length > 0 && (
-            <>
-              <span className="mx-4 h-6 w-px bg-white/15" aria-hidden="true" />
-              <ul className="flex items-center gap-1">
-                {secondaryNav.map((item) => {
-                  const Icon = NAV_ICONS[item.path]
-                  return (
-                    <li key={item.path}>
-                      <NavLink to={item.path} className={secondaryLinkClasses}>
-                        {Icon && <Icon size={14} strokeWidth={2} />}
-                        {item.label}
-                      </NavLink>
-                    </li>
-                  )
-                })}
-              </ul>
-            </>
-          )}
-
           {user ? (
             <div className="ml-4 flex items-center gap-1 border-l border-white/15 pl-4">
               <span className="mr-1 text-xs text-white/50">{user.name}</span>
@@ -151,9 +124,6 @@ export function Navbar() {
         <nav className="border-t border-white/10 px-5 pb-4 lg:hidden">
           {primaryNav.length > 0 && (
             <>
-              <p className="pt-3 pb-1 text-xs font-medium text-white/40">
-                {role === 'authority' ? 'Operations' : 'Citizen reporting'}
-              </p>
               <ul className="flex flex-col">
                 {primaryNav.map((item) => {
                   const Icon = NAV_ICONS[item.path]
@@ -169,33 +139,6 @@ export function Navbar() {
                         }
                       >
                         {Icon && <Icon size={17} strokeWidth={2.25} />}
-                        {item.label}
-                      </NavLink>
-                    </li>
-                  )
-                })}
-              </ul>
-            </>
-          )}
-
-          {secondaryNav.length > 0 && (
-            <>
-              <p className="pt-3 pb-1 text-xs font-medium text-white/40">More</p>
-              <ul className="flex flex-col">
-                {secondaryNav.map((item) => {
-                  const Icon = NAV_ICONS[item.path]
-                  return (
-                    <li key={item.path}>
-                      <NavLink
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm ${
-                            isActive ? 'text-white/90' : 'text-white/50'
-                          }`
-                        }
-                      >
-                        {Icon && <Icon size={15} strokeWidth={2} />}
                         {item.label}
                       </NavLink>
                     </li>

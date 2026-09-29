@@ -2,38 +2,32 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { CircleCheck, Loader2, MapPin } from 'lucide-react'
 import { Button } from '../common/Button'
-import { Card } from '../common/Card'
-import { ReportLifecycle } from '../common/ReportLifecycle'
 import { MapView } from '../map/MapView'
 import { LocationPicker } from '../map/LocationPicker'
 import { ImageUploader } from './ImageUploader'
 import { submitReport } from '../../services/api'
 import { MUMBAI_CENTER } from '../../constants/map'
 import { WASTE_CATEGORIES } from '../../constants/report'
-import type { CitizenReport, ReportSeverity } from '../../types'
+import type { ReportSeverity } from '../../types'
 
-const SEVERITY_OPTIONS: { value: ReportSeverity; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-]
+// Severity isn't asked of citizens — it has no effect on routing. The API
+// contract still carries it, so submit the neutral default.
+const DEFAULT_SEVERITY: ReportSeverity = 'medium'
 
 interface FormErrors {
   address?: string
   category?: string
-  description?: string
 }
 
 export function ReportWasteForm() {
   const [address, setAddress] = useState('')
   const [category, setCategory] = useState('')
-  const [severity, setSeverity] = useState<ReportSeverity>('medium')
   const [description, setDescription] = useState('')
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [position, setPosition] = useState<[number, number]>(MUMBAI_CENTER)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submittedReport, setSubmittedReport] = useState<CitizenReport | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   // Bumped on reset to remount the image uploader and map (both hold their
   // own uncontrolled/imperative state that plain prop resets wouldn't clear).
   const [formKey, setFormKey] = useState(0)
@@ -41,22 +35,18 @@ export function ReportWasteForm() {
   function resetForm() {
     setAddress('')
     setCategory('')
-    setSeverity('medium')
     setDescription('')
     setImageUrl(null)
     setPosition(MUMBAI_CENTER)
     setErrors({})
-    setSubmittedReport(null)
+    setIsSubmitted(false)
     setFormKey((key) => key + 1)
   }
 
   function validate(): FormErrors {
     const nextErrors: FormErrors = {}
-    if (!address.trim()) nextErrors.address = 'Enter a location or address.'
-    if (!category) nextErrors.category = 'Choose a waste category.'
-    if (description.trim().length < 10) {
-      nextErrors.description = 'Add a few more details (at least 10 characters).'
-    }
+    if (!address.trim()) nextErrors.address = 'Where is the waste?'
+    if (!category) nextErrors.category = 'Choose a waste type.'
     return nextErrors
   }
 
@@ -67,146 +57,116 @@ export function ReportWasteForm() {
     if (Object.keys(nextErrors).length > 0) return
 
     setIsSubmitting(true)
-    const report = await submitReport({
+    await submitReport({
       address: address.trim(),
       latitude: position[0],
       longitude: position[1],
       category,
-      severity,
+      severity: DEFAULT_SEVERITY,
       description: description.trim(),
       imageUrl,
     })
     setIsSubmitting(false)
-    setSubmittedReport(report)
+    setIsSubmitted(true)
   }
 
-  if (submittedReport) {
+  if (isSubmitted) {
     return (
-      <Card className="p-8 text-center">
-        <CircleCheck className="mx-auto text-primary" size={36} strokeWidth={1.5} />
-        <p className="mt-3 font-display text-lg font-semibold text-ink">Report submitted successfully</p>
-        <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted">
-          Your report will be reviewed before it can be added to a collection route.
+      <div className="py-8 text-center">
+        <CircleCheck className="mx-auto text-primary" size={40} strokeWidth={1.5} />
+        <p className="mt-4 font-display text-2xl font-semibold text-ink">Report submitted</p>
+        <p className="mx-auto mt-2 max-w-sm text-base text-muted">
+          Your report will be reviewed before being added to a collection route.
         </p>
 
-        <div className="mx-auto mt-6 max-w-xs">
-          <ReportLifecycle status={submittedReport.status} />
-        </div>
-
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/my-reports">
-            <Button variant="secondary">View my reports</Button>
+            <Button>View My Reports</Button>
           </Link>
-          <Button onClick={resetForm}>Report another point</Button>
+          <Button variant="secondary" onClick={resetForm}>
+            Report Another
+          </Button>
         </div>
-      </Card>
+      </div>
     )
   }
 
+  const inputClasses =
+    'mt-1.5 w-full rounded-lg border border-ink/10 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none'
+
   return (
-    <Card className="p-6">
-      <form key={formKey} className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <div>
-          <label htmlFor="address" className="text-sm font-medium text-ink">
-            Location or address
-          </label>
-          <input
-            id="address"
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-            placeholder="e.g. Behind Bandra Bus Depot"
-            className="mt-1.5 w-full rounded-lg border border-ink/10 bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none"
-          />
-          {errors.address && <p className="mt-1.5 text-xs text-[#D97706]">{errors.address}</p>}
+    <form key={formKey} className="space-y-6" onSubmit={handleSubmit} noValidate>
+      <div>
+        <label htmlFor="address" className="text-sm font-medium text-ink">
+          Location
+        </label>
+        <input
+          id="address"
+          value={address}
+          onChange={(event) => setAddress(event.target.value)}
+          placeholder="e.g. Behind Bandra Bus Depot"
+          className={inputClasses}
+        />
+        {errors.address && <p className="mt-1.5 text-xs text-[#D97706]">{errors.address}</p>}
+        <div className="mt-2 h-44 overflow-hidden rounded-lg border border-ink/10">
+          <MapView center={position} zoom={14}>
+            <LocationPicker position={position} onChange={setPosition} />
+          </MapView>
         </div>
+        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted">
+          <MapPin size={12} />
+          Tap the map to mark the exact spot.
+        </p>
+      </div>
 
-        <div>
-          <label htmlFor="category" className="text-sm font-medium text-ink">
-            Waste category
-          </label>
-          <select
-            id="category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-ink/10 bg-bg px-3.5 py-2.5 text-sm text-ink focus:border-primary focus:outline-none"
-          >
-            <option value="">Select a category</option>
-            {WASTE_CATEGORIES.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          {errors.category && <p className="mt-1.5 text-xs text-[#D97706]">{errors.category}</p>}
-        </div>
+      <div>
+        <span className="text-sm font-medium text-ink">Photo</span>
+        <ImageUploader onImageChange={setImageUrl} />
+      </div>
 
-        <div>
-          <span className="text-sm font-medium text-ink">Severity</span>
-          <div className="mt-1.5 flex gap-2">
-            {SEVERITY_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setSeverity(option.value)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                  severity === option.value
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-ink/10 bg-bg text-muted hover:border-primary/40 hover:text-ink'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div>
+        <label htmlFor="category" className="text-sm font-medium text-ink">
+          Waste Type
+        </label>
+        <select
+          id="category"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+          className={inputClasses}
+        >
+          <option value="">Select a type</option>
+          {WASTE_CATEGORIES.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {errors.category && <p className="mt-1.5 text-xs text-[#D97706]">{errors.category}</p>}
+      </div>
 
-        <div>
-          <label htmlFor="description" className="text-sm font-medium text-ink">
-            What did you find?
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows={4}
-            placeholder="Describe the waste and how long it&rsquo;s been there"
-            className="mt-1.5 w-full resize-none rounded-lg border border-ink/10 bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none"
-          />
-          {errors.description && <p className="mt-1.5 text-xs text-[#D97706]">{errors.description}</p>}
-        </div>
+      <div>
+        <label htmlFor="description" className="text-sm font-medium text-ink">
+          Description <span className="font-normal text-muted">(optional)</span>
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          rows={3}
+          className={`${inputClasses} resize-none`}
+        />
+      </div>
 
-        <div>
-          <span className="text-sm font-medium text-ink">Photo</span>
-          <ImageUploader onImageChange={setImageUrl} />
-        </div>
-
-        <div>
-          <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
-            <MapPin size={14} />
-            Pinpoint the location
-          </span>
-          <p className="mt-1 text-xs text-muted">Tap the map to place the marker where the waste is.</p>
-          <div className="mt-1.5 h-48 overflow-hidden rounded-lg border border-ink/10">
-            <MapView center={position} zoom={14}>
-              <LocationPicker position={position} onChange={setPosition} />
-            </MapView>
-          </div>
-          <p className="mt-1.5 text-xs text-muted">
-            Selected: {position[0].toFixed(4)}, {position[1].toFixed(4)}
-          </p>
-        </div>
-
-        <Button type="submit" className="w-full justify-center" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 size={15} className="animate-spin" />
-              Submitting&hellip;
-            </>
-          ) : (
-            'Submit report'
-          )}
-        </Button>
-      </form>
-    </Card>
+      <Button type="submit" className="w-full justify-center py-3.5 text-base" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 size={17} className="animate-spin" />
+            Submitting&hellip;
+          </>
+        ) : (
+          'Report Waste'
+        )}
+      </Button>
+    </form>
   )
 }

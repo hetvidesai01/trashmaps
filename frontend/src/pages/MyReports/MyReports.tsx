@@ -1,62 +1,46 @@
-import { Card } from '../../components/common/Card'
+import { Link } from 'react-router-dom'
 import { StatusBadge } from '../../components/common/StatusBadge'
-import { ReportLifecycle } from '../../components/common/ReportLifecycle'
 import { PageContainer } from '../../components/layout/PageContainer'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { getCitizenReports } from '../../services/api'
-import { formatDateTime } from '../../utils/format'
+import { formatReportedTime } from '../../utils/format'
 
 export function MyReports() {
   const { data: reports, isLoading } = useAsyncData(getCitizenReports)
 
   return (
     <PageContainer className="max-w-2xl">
-      <header>
-        <h1 className="font-display text-2xl font-semibold text-ink">My reports</h1>
-        <p className="mt-1 text-sm text-muted">Waste reports you&rsquo;ve submitted and their review status.</p>
-      </header>
+      <h1 className="font-display text-2xl font-semibold text-ink">My Reports</h1>
 
       {isLoading && <p className="mt-6 text-sm text-muted">Loading your reports&hellip;</p>}
 
       {!isLoading && reports?.length === 0 && (
-        <Card className="mt-6 p-6 text-center text-sm text-muted">
-          You haven&rsquo;t submitted any reports yet.
-        </Card>
+        <div className="mt-6 text-sm text-muted">
+          <p>You haven&rsquo;t reported anything yet.</p>
+          <Link to="/report" className="mt-2 inline-block font-medium text-primary-dark hover:underline">
+            Report Waste
+          </Link>
+        </div>
       )}
 
-      <div className="mt-6 space-y-4">
+      <ul className="mt-6 divide-y divide-ink/[0.08]">
         {reports?.map((report) => (
-          <Card key={report.id} className="p-4">
-            <div className="flex gap-3">
-              {report.imageUrl && (
-                <img
-                  src={report.imageUrl}
-                  alt={`Photo submitted for ${report.category}`}
-                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-ink">{report.category}</p>
-                    <p className="truncate text-xs text-muted">{report.address}</p>
-                  </div>
-                  <StatusBadge reportStatus={report.status} />
-                </div>
-                <p className="mt-1.5 text-sm text-muted">{report.description}</p>
-                <p className="mt-2 text-xs text-muted">
-                  {report.severity.charAt(0).toUpperCase() + report.severity.slice(1)} severity,
-                  submitted {formatDateTime(report.reportedAt)}
-                </p>
-              </div>
+          <li key={report.id} className="flex items-center gap-4 py-4">
+            {report.imageUrl && (
+              <img
+                src={report.imageUrl}
+                alt={`Photo submitted for ${report.category}`}
+                className="h-14 w-14 shrink-0 rounded-lg object-cover"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-medium text-ink">{report.address}</p>
+              <p className="mt-0.5 text-sm text-muted">Submitted {formatReportedTime(report.reportedAt)}</p>
             </div>
-
-            <div className="mt-4 border-t border-ink/[0.06] pt-4">
-              <ReportLifecycle status={report.status} />
-            </div>
-          </Card>
+            <StatusBadge reportStatus={report.status} />
+          </li>
         ))}
-      </div>
+      </ul>
     </PageContainer>
   )
 }

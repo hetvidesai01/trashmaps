@@ -15,10 +15,10 @@ export const STATUS_COLOR: Record<CollectionStatus, string> = {
 export const CITIZEN_SOURCE_COLOR = 'var(--color-status-citizen)'
 
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
-  pending_verification: 'Pending verification',
-  verified_active: 'Verified / active',
-  included_in_route: 'Included in route',
-  resolved: 'Resolved',
+  pending_verification: 'Under Review',
+  verified_active: 'Approved',
+  included_in_route: 'Added to Route',
+  resolved: 'Collected',
   rejected: 'Rejected',
 }
 

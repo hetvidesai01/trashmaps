@@ -181,7 +181,7 @@ export function Login() {
 
               <div className="mb-4 flex items-start gap-2 rounded-lg bg-ink/[0.04] px-3.5 py-3 text-xs text-muted">
                 <ShieldCheck size={15} className="mt-0.5 shrink-0 text-primary-dark" />
-                <span>Access is restricted to verified waste-management personnel.</span>
+                <span>Restricted to verified waste-management personnel.</span>
               </div>
 
               <form onSubmit={handleMockSubmit} className="space-y-4">

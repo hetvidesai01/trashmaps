@@ -47,8 +47,8 @@ export function ReportReviewModal({ report, onApprove, onReject, onClose }: Repo
             </p>
             <p className="mx-auto mt-1.5 max-w-xs text-sm text-muted">
               {outcome === 'approved'
-                ? 'A new citizen collection point has been created and is now eligible for route optimization.'
-                : 'This report is kept for history but will not become a collection point.'}
+                ? 'This stop is now eligible to be added to a collection route.'
+                : 'This report will not be added to a collection route.'}
             </p>
             <Button className="mt-6" onClick={onClose}>
               Done
@@ -58,7 +58,6 @@ export function ReportReviewModal({ report, onApprove, onReject, onClose }: Repo
           <>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs text-muted">{report.id}</p>
                 <h2 className="font-display text-lg font-semibold text-ink">{report.category}</h2>
               </div>
               <button
@@ -82,16 +81,12 @@ export function ReportReviewModal({ report, onApprove, onReject, onClose }: Repo
               />
             )}
 
-            <p className="mt-4 text-sm text-ink">{report.description}</p>
+            {report.description && <p className="mt-4 text-sm text-ink">{report.description}</p>}
 
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-muted">Location</dt>
                 <dd className="text-ink">{report.address}</dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-muted">Severity</dt>
-                <dd className="capitalize text-ink">{report.severity}</dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-muted">Reported by</dt>
@@ -117,10 +112,10 @@ export function ReportReviewModal({ report, onApprove, onReject, onClose }: Repo
                   onClick={handleReject}
                   disabled={pendingAction !== null}
                 >
-                  {pendingAction === 'reject' ? <Loader2 size={15} className="animate-spin" /> : 'Reject report'}
+                  {pendingAction === 'reject' ? <Loader2 size={15} className="animate-spin" /> : 'Reject'}
                 </Button>
                 <Button className="flex-1 justify-center" onClick={handleApprove} disabled={pendingAction !== null}>
-                  {pendingAction === 'approve' ? <Loader2 size={15} className="animate-spin" /> : 'Approve report'}
+                  {pendingAction === 'approve' ? <Loader2 size={15} className="animate-spin" /> : 'Approve'}
                 </Button>
               </div>
             ) : (

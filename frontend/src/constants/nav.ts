@@ -5,13 +5,12 @@ export interface NavItem {
 
 export const AUTHORITY_PRIMARY_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard' },
-  { label: 'Route Operations', path: '/routes' },
-  { label: 'Citizen Reports', path: '/citizen-reports' },
+  { label: 'Route', path: '/routes' },
+  { label: 'Reports', path: '/citizen-reports' },
 ]
 
-// The waste map stays functional but is secondary now that citizens and
-// authorities have their own dedicated flows — kept out of primary nav.
-export const AUTHORITY_SECONDARY_NAV: NavItem[] = [{ label: 'Waste Map', path: '/map' }]
+// The waste map (/map) stays routable but is intentionally not in the nav:
+// the Route page is where authorities see stops on a map now.
 
 export const CITIZEN_PRIMARY_NAV: NavItem[] = [
   { label: 'Report Waste', path: '/report' },

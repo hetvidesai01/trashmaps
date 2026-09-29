@@ -15,9 +15,28 @@ interface CollectionPointMarkerProps {
   onSelect?: (point: CollectionPoint) => void
   /** Stop number within the currently optimized sequence, if any. */
   orderLabel?: number
+  /** Plain-language popup (address + one short label) instead of the full detail popup. */
+  simple?: boolean
 }
 
-export function CollectionPointMarker({ point, onSelect, orderLabel }: CollectionPointMarkerProps) {
+function simpleLabel(point: CollectionPoint): string {
+  if (point.status === 'collected') return 'Collected'
+  if (point.status === 'skipped') return 'Skipped today'
+  return point.source === 'citizen' ? 'Citizen report' : 'Needs collection'
+}
+
+export function CollectionPointMarker({ point, onSelect, orderLabel, simple }: CollectionPointMarkerProps) {
+  if (simple) {
+    return (
+      <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel)}>
+        <Popup>
+          <p className="text-sm font-medium text-ink">{point.address}</p>
+          <p className="text-xs text-muted">{simpleLabel(point)}</p>
+        </Popup>
+      </Marker>
+    )
+  }
+
   if (onSelect) {
     return (
       <Marker

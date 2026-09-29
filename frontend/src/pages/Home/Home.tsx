@@ -1,171 +1,51 @@
-import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  Route as RouteIcon,
-  Map,
-  MessageSquarePlus,
-  ClipboardList,
-  ArrowUpRight,
-  ArrowRight,
-  ChevronRight,
-} from 'lucide-react'
-import { Card } from '../../components/common/Card'
+import { ArrowRight } from 'lucide-react'
 import { PageContainer } from '../../components/layout/PageContainer'
-import { useAsyncData } from '../../hooks/useAsyncData'
-import { getDashboardStats } from '../../services/api'
+import { useAuth } from '../../auth/AuthContext'
+import { ROLE_HOME } from '../../auth/roleHome'
 import { RouteArt } from './RouteArt'
 
-const FLOW_STEPS = [
-  'Existing route',
-  'Detect required stops',
-  'Add verified citizen reports',
-  'Optimize route',
-  'Collect',
-]
-
-const OPERATIONAL_FEATURES = [
-  {
-    to: '/dashboard',
-    icon: LayoutDashboard,
-    title: 'Operations dashboard',
-    description: 'See today’s collection load across every ward at a glance.',
-  },
-  {
-    to: '/routes',
-    icon: RouteIcon,
-    title: 'Route optimization',
-    description: 'Send the active stop set for a route to the optimizer and track progress.',
-  },
-  {
-    to: '/map',
-    icon: Map,
-    title: 'Waste map',
-    description: 'View every collection point, its status, and its source on one map.',
-  },
-]
-
-const CITIZEN_FEATURES = [
-  { to: '/report', icon: MessageSquarePlus, title: 'Report waste' },
-  { to: '/my-reports', icon: ClipboardList, title: 'My reports' },
-]
+const STEPS = ['Normal route', 'Skip stops that don’t need pickup', 'Add citizen reports', 'Shorter route']
 
 export function Home() {
-  const { data: stats } = useAsyncData(getDashboardStats)
+  const { role } = useAuth()
 
   return (
-    <PageContainer className="max-w-7xl">
+    <PageContainer>
       <section className="grid items-center gap-12 py-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-14">
         <div>
           <h1 className="max-w-xl text-4xl font-semibold leading-[1.08] text-ink lg:text-5xl">
             Collect only where it matters.
           </h1>
           <p className="mt-5 max-w-md text-[17px] leading-relaxed text-muted">
-            TrashMaps checks each stop on your existing routes, drops the ones that don&rsquo;t need
-            a pickup today, folds in verified citizen reports, and hands the active set to your
-            route optimizer.
+            TrashMaps helps a collection vehicle visit only the places that actually need
+            collection, instead of every stop on its normal route.
           </p>
-          <div className="mt-8 grid max-w-md grid-cols-2 gap-3">
+
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/dashboard"
-              className="rounded-lg border border-ink/10 bg-surface p-4 transition-colors hover:border-primary/40"
+              to={role ? ROLE_HOME[role] : '/login'}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
             >
-              <p className="text-xs text-muted">For authorities</p>
-              <p className="mt-1 flex items-center gap-1.5 font-medium text-ink">
-                Operations dashboard
-                <ArrowRight size={14} className="text-primary-dark" />
-              </p>
-            </Link>
-            <Link
-              to="/report"
-              className="rounded-lg border border-ink/10 bg-surface p-4 transition-colors hover:border-primary/40"
-            >
-              <p className="text-xs text-muted">For citizens</p>
-              <p className="mt-1 flex items-center gap-1.5 font-medium text-ink">
-                Report waste
-                <ArrowRight size={14} className="text-primary-dark" />
-              </p>
+              {role ? 'Continue' : 'Log in'}
+              <ArrowRight size={15} />
             </Link>
           </div>
 
-          {stats && (
-            <dl className="mt-10 grid grid-cols-3 gap-x-8 gap-y-5 border-t border-ink/10 pt-6">
-              <div>
-                <dt className="text-xs text-muted">Points on route today</dt>
-                <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-                  {stats.pointsOnRouteToday}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted">Need collection</dt>
-                <dd className="mt-1 font-display text-2xl font-semibold text-[#D97706]">
-                  {stats.requiringCollection}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted">Collected today</dt>
-                <dd className="mt-1 font-display text-2xl font-semibold text-primary">
-                  {stats.collectedToday}
-                </dd>
-              </div>
-            </dl>
-          )}
-        </div>
-
-        <Card className="flex h-72 items-center justify-center p-6 lg:h-80">
-          <RouteArt />
-        </Card>
-      </section>
-
-      <section className="pb-8">
-        <Card className="flex flex-wrap items-center gap-x-2 gap-y-2 px-5 py-4">
-          {FLOW_STEPS.map((step, index) => (
-            <Fragment key={step}>
-              <span className="text-sm font-medium text-ink">{step}</span>
-              {index < FLOW_STEPS.length - 1 && (
-                <ChevronRight size={14} className="shrink-0 text-muted" />
-              )}
-            </Fragment>
-          ))}
-        </Card>
-      </section>
-
-      <section className="py-8">
-        <h2 className="text-sm font-semibold text-muted">Core operations</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {OPERATIONAL_FEATURES.map(({ to, icon: Icon, title, description }) => (
-            <Link key={to} to={to}>
-              <Card className="group h-full p-6 transition-shadow hover:shadow-[0_2px_4px_rgba(20,30,25,0.06),0_16px_32px_rgba(20,30,25,0.08)]">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-                  <Icon size={19} strokeWidth={2} />
+          <ol className="mt-12 space-y-2 text-sm text-muted">
+            {STEPS.map((step, index) => (
+              <li key={step} className="flex items-center gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary-dark">
+                  {index + 1}
                 </span>
-                <h3 className="mt-4 flex items-center gap-1.5 font-display text-lg font-semibold text-ink">
-                  {title}
-                  <ArrowUpRight
-                    size={16}
-                    className="text-muted opacity-0 transition-opacity group-hover:opacity-100"
-                  />
-                </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{description}</p>
-              </Card>
-            </Link>
-          ))}
+                {step}
+              </li>
+            ))}
+          </ol>
         </div>
-      </section>
 
-      <section className="py-4">
-        <h2 className="text-sm font-semibold text-muted">Citizen reporting</h2>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {CITIZEN_FEATURES.map(({ to, icon: Icon, title }) => (
-            <Link
-              key={to}
-              to={to}
-              className="flex items-center gap-2 rounded-lg border border-ink/10 bg-surface px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-primary/30"
-            >
-              <Icon size={16} className="text-muted" />
-              {title}
-            </Link>
-          ))}
+        <div className="flex h-72 items-center justify-center lg:h-80">
+          <RouteArt />
         </div>
       </section>
     </PageContainer>
