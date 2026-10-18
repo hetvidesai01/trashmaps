@@ -23,9 +23,9 @@ export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
 }
 
 export const REPORT_STATUS_COLOR: Record<ReportStatus, string> = {
-  pending_verification: 'var(--color-status-requires)',
-  verified_active: 'var(--color-status-citizen)',
-  included_in_route: 'var(--color-status-collected)',
-  resolved: 'var(--color-status-skipped)',
-  rejected: 'var(--color-status-skipped)',
+  pending_verification: '#b9731d',
+  verified_active: '#3f8a3a',
+  included_in_route: '#3d6f9e',
+  resolved: '#1f7a4c',
+  rejected: '#9a5b52',
 }

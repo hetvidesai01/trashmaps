@@ -21,8 +21,8 @@ export function RouteLayer({ route, variant }: RouteLayerProps) {
       positions={positions}
       pathOptions={
         variant === 'original'
-          ? { color: '#6B7280', weight: 2, dashArray: '6 8', opacity: 0.6 }
-          : { color: '#1E7A4C', weight: 4, opacity: 0.9 }
+          ? { color: '#8a8f84', weight: 3, dashArray: '2 9', lineCap: 'round', opacity: 0.8 }
+          : { color: '#176b4d', weight: 5, opacity: 0.92, lineCap: 'round', lineJoin: 'round' }
       }
     />
   )

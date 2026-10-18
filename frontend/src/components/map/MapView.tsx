@@ -14,7 +14,7 @@ export function MapView({
   center = MUMBAI_CENTER,
   zoom = DEFAULT_ZOOM,
   scrollWheelZoom = true,
-  className = 'h-full w-full',
+  className = 'isolate h-full w-full',
   children,
 }: MapViewProps) {
   return (

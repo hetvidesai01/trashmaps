@@ -15,6 +15,8 @@ interface CollectionPointMarkerProps {
   onSelect?: (point: CollectionPoint) => void
   /** Stop number within the currently optimized sequence, if any. */
   orderLabel?: number
+  /** Emphasise the marker (e.g. the stop the vehicle is heading to next). */
+  highlight?: boolean
   /** Plain-language popup (address + one short label) instead of the full detail popup. */
   simple?: boolean
 }
@@ -25,13 +27,13 @@ function simpleLabel(point: CollectionPoint): string {
   return point.source === 'citizen' ? 'Citizen report' : 'Needs collection'
 }
 
-export function CollectionPointMarker({ point, onSelect, orderLabel, simple }: CollectionPointMarkerProps) {
+export function CollectionPointMarker({ point, onSelect, orderLabel, highlight, simple }: CollectionPointMarkerProps) {
   if (simple) {
     return (
-      <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel)}>
+      <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel, highlight)}>
         <Popup>
-          <p className="text-sm font-medium text-ink">{point.address}</p>
-          <p className="text-xs text-muted">{simpleLabel(point)}</p>
+          <p className="text-sm font-bold text-ink">{point.address}</p>
+          <p className="text-xs font-semibold text-muted">{simpleLabel(point)}</p>
         </Popup>
       </Marker>
     )
@@ -41,14 +43,14 @@ export function CollectionPointMarker({ point, onSelect, orderLabel, simple }: C
     return (
       <Marker
         position={[point.latitude, point.longitude]}
-        icon={pointIcon(point, orderLabel)}
+        icon={pointIcon(point, orderLabel, highlight)}
         eventHandlers={{ click: () => onSelect(point) }}
       />
     )
   }
 
   return (
-    <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel)}>
+    <Marker position={[point.latitude, point.longitude]} icon={pointIcon(point, orderLabel, highlight)}>
       <Popup>
         <div className="min-w-[200px] space-y-1.5">
           <p className="text-sm font-medium text-ink">{point.address}</p>

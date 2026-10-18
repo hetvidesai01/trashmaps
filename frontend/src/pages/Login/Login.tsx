@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, LayoutDashboard, MessageSquarePlus, ShieldCheck, Trash2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ShieldCheck, Truck, Users } from 'lucide-react'
 import { Button } from '../../components/common/Button'
-import { Card } from '../../components/common/Card'
+import { inputClasses, labelClasses } from '../../components/forms/fieldStyles'
+import { LeafMark, SceneBackdrop } from '../../components/illustrations'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_HOME } from '../../auth/roleHome'
 import type { UserRole } from '../../auth/authStorage'
@@ -17,8 +18,7 @@ type LoginMode = 'choice' | UserRole
 const HEADER_COPY: Record<LoginMode, { title: string; description: string }> = {
   choice: {
     title: 'TrashMaps',
-    description:
-      'Smarter collection routes for authorities, and a direct line to report waste for citizens.',
+    description: 'Cleaner Cities.\nSmarter Routes.',
   },
   authority: {
     title: 'Authority login',
@@ -28,6 +28,34 @@ const HEADER_COPY: Record<LoginMode, { title: string; description: string }> = {
     title: 'Citizen login',
     description: 'Sign in to report waste and track your submissions.',
   },
+}
+
+interface RoleCardProps {
+  icon: typeof Truck
+  title: string
+  description: string
+  tint: string
+  iconColor: string
+  onClick: () => void
+}
+
+function RoleCard({ icon: Icon, title, description, tint, iconColor, onClick }: RoleCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`tm-press group flex w-full items-center gap-4 rounded-3xl border border-white/70 px-5 py-4 text-left shadow-card ${tint}`}
+    >
+      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/80">
+        <Icon size={26} strokeWidth={1.9} className={iconColor} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-extrabold text-ink">{title}</span>
+        <span className="mt-0.5 block text-xs font-semibold leading-snug text-muted">{description}</span>
+      </span>
+      <ArrowRight size={20} className="shrink-0 text-muted transition-transform group-hover:translate-x-1" />
+    </button>
+  )
 }
 
 export function Login() {
@@ -59,66 +87,59 @@ export function Login() {
   }
 
   const { title, description } = HEADER_COPY[mode]
+  const isChoice = mode === 'choice'
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-bg px-5 py-12">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-dark text-accent">
-            <Trash2 size={22} strokeWidth={2.25} />
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-semibold text-ink">{title}</h1>
-          <p className="mt-1.5 max-w-xs text-sm text-muted">{description}</p>
-        </div>
+    <div className="relative min-h-svh overflow-hidden bg-[#f3f4e4]">
+      <SceneBackdrop width={420} height={820} className="absolute inset-0 h-full w-full md:hidden" />
+      <SceneBackdrop width={1360} height={820} className="absolute inset-0 hidden h-full w-full md:block" />
 
-        <Card className="p-6">
-          {mode === 'choice' && (
-            <div className="space-y-2.5">
-              <button
-                type="button"
-                onClick={() => selectMode('citizen')}
-                className="flex w-full items-center gap-3 rounded-lg border border-ink/10 px-4 py-3.5 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-primary-dark">
-                  <MessageSquarePlus size={17} strokeWidth={2} />
-                </span>
-                <span>
-                  <span className="block text-sm font-medium text-ink">Citizen Login</span>
-                  <span className="block text-xs text-muted">Report waste &amp; track your reports</span>
-                </span>
-              </button>
-              <button
-                type="button"
+      <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-md flex-col px-6 pb-10 pt-12">
+        <header className="tm-rise flex flex-col items-center text-center">
+          <LeafMark className={isChoice ? 'h-16 w-16' : 'h-12 w-12'} />
+          <h1
+            className={`font-display font-semibold tracking-tight text-primary-dark ${
+              isChoice ? 'mt-1 text-5xl' : 'mt-3 text-3xl'
+            }`}
+          >
+            {title}
+          </h1>
+          <p className="mt-3 max-w-xs whitespace-pre-line text-base font-semibold leading-snug text-ink/80">
+            {description}
+          </p>
+        </header>
+
+        <div className="flex-1" />
+
+        <div className="tm-rise mt-10" style={{ animationDelay: '0.12s' }}>
+          {isChoice && (
+            <div className="space-y-3.5">
+              <RoleCard
+                icon={Truck}
+                title="Continue as Authority"
+                description="For verified waste-management personnel"
+                tint="bg-sage-soft/95"
+                iconColor="text-primary"
                 onClick={() => selectMode('authority')}
-                className="flex w-full items-center gap-3 rounded-lg border border-ink/10 px-4 py-3.5 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-dark">
-                  <LayoutDashboard size={17} strokeWidth={2} />
-                </span>
-                <span>
-                  <span className="block text-sm font-medium text-ink">Authority Login</span>
-                  <span className="block text-xs text-muted">
-                    Dashboard, route operations &amp; report verification
-                  </span>
-                </span>
-              </button>
+              />
+              <RoleCard
+                icon={Users}
+                title="Continue as Citizen"
+                description="Report waste for a cleaner city"
+                tint="bg-surface/95"
+                iconColor="text-[#3d6f9e]"
+                onClick={() => selectMode('citizen')}
+              />
             </div>
           )}
 
           {mode === 'citizen' && (
-            <>
-              <button
-                type="button"
-                onClick={() => selectMode('choice')}
-                className="mb-4 flex items-center gap-1.5 text-xs font-medium text-muted hover:text-ink"
-              >
-                <ArrowLeft size={13} />
-                Back
-              </button>
+            <div className="rounded-3xl border border-white/70 bg-surface p-6 shadow-lift">
+              <BackButton onClick={() => selectMode('choice')} />
 
               <form onSubmit={handleMockSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="citizen-identifier" className="text-xs font-medium text-muted">
+                  <label htmlFor="citizen-identifier" className={labelClasses}>
                     Email or Mobile
                   </label>
                   <input
@@ -126,11 +147,11 @@ export function Login() {
                     type="text"
                     autoComplete="username"
                     placeholder="you@example.com or 98765 43210"
-                    className="mt-1.5 w-full rounded-lg border border-ink/10 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary/50 focus:outline-none"
+                    className={inputClasses}
                   />
                 </div>
                 <div>
-                  <label htmlFor="citizen-password" className="text-xs font-medium text-muted">
+                  <label htmlFor="citizen-password" className={labelClasses}>
                     Password
                   </label>
                   <input
@@ -138,55 +159,35 @@ export function Login() {
                     type="password"
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className="mt-1.5 w-full rounded-lg border border-ink/10 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary/50 focus:outline-none"
+                    className={inputClasses}
                   />
                 </div>
-                <Button type="submit" className="w-full justify-center">
+                <Button type="submit" className="w-full">
                   Log in
                 </Button>
-                {showFormHint && (
-                  <p className="text-center text-xs text-muted">
-                    This is a prototype — use the demo account below to continue.
-                  </p>
-                )}
+                {showFormHint && <PrototypeHint />}
               </form>
 
-              <div className="my-5 flex items-center gap-3">
-                <span className="h-px flex-1 bg-ink/10" aria-hidden="true" />
-                <span className="text-xs text-muted">or</span>
-                <span className="h-px flex-1 bg-ink/10" aria-hidden="true" />
-              </div>
+              <Divider />
 
-              <Button
-                type="button"
-                variant="secondary"
-                className="w-full justify-center"
-                onClick={() => handleDemoLogin('citizen')}
-              >
+              <Button type="button" variant="soft" className="w-full" onClick={() => handleDemoLogin('citizen')}>
                 Use Demo Citizen Account
               </Button>
-            </>
+            </div>
           )}
 
           {mode === 'authority' && (
-            <>
-              <button
-                type="button"
-                onClick={() => selectMode('choice')}
-                className="mb-4 flex items-center gap-1.5 text-xs font-medium text-muted hover:text-ink"
-              >
-                <ArrowLeft size={13} />
-                Back
-              </button>
+            <div className="rounded-3xl border border-white/70 bg-surface p-6 shadow-lift">
+              <BackButton onClick={() => selectMode('choice')} />
 
-              <div className="mb-4 flex items-start gap-2 rounded-lg bg-ink/[0.04] px-3.5 py-3 text-xs text-muted">
-                <ShieldCheck size={15} className="mt-0.5 shrink-0 text-primary-dark" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-2xl bg-sage-soft px-4 py-3 text-xs font-semibold text-primary-dark">
+                <ShieldCheck size={16} className="mt-0.5 shrink-0" />
                 <span>Restricted to verified waste-management personnel.</span>
               </div>
 
               <form onSubmit={handleMockSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="authority-id" className="text-xs font-medium text-muted">
+                  <label htmlFor="authority-id" className={labelClasses}>
                     Authority ID
                   </label>
                   <input
@@ -194,11 +195,11 @@ export function Login() {
                     type="text"
                     autoComplete="username"
                     placeholder="e.g. WM-2451"
-                    className="mt-1.5 w-full rounded-lg border border-ink/10 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary/50 focus:outline-none"
+                    className={inputClasses}
                   />
                 </div>
                 <div>
-                  <label htmlFor="authority-password" className="text-xs font-medium text-muted">
+                  <label htmlFor="authority-password" className={labelClasses}>
                     Password
                   </label>
                   <input
@@ -206,37 +207,55 @@ export function Login() {
                     type="password"
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className="mt-1.5 w-full rounded-lg border border-ink/10 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary/50 focus:outline-none"
+                    className={inputClasses}
                   />
                 </div>
-                <Button type="submit" className="w-full justify-center">
+                <Button type="submit" className="w-full">
                   Login as Authority
                 </Button>
-                {showFormHint && (
-                  <p className="text-center text-xs text-muted">
-                    This is a prototype — use the demo account below to continue.
-                  </p>
-                )}
+                {showFormHint && <PrototypeHint />}
               </form>
 
-              <div className="my-5 flex items-center gap-3">
-                <span className="h-px flex-1 bg-ink/10" aria-hidden="true" />
-                <span className="text-xs text-muted">or</span>
-                <span className="h-px flex-1 bg-ink/10" aria-hidden="true" />
-              </div>
+              <Divider />
 
-              <Button
-                type="button"
-                variant="secondary"
-                className="w-full justify-center"
-                onClick={() => handleDemoLogin('authority')}
-              >
+              <Button type="button" variant="soft" className="w-full" onClick={() => handleDemoLogin('authority')}>
                 Use Demo Authority Account
               </Button>
-            </>
+            </div>
           )}
-        </Card>
+        </div>
       </div>
+    </div>
+  )
+}
+
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mb-4 flex items-center gap-1.5 text-xs font-bold text-muted transition-colors hover:text-ink"
+    >
+      <ArrowLeft size={14} />
+      Back
+    </button>
+  )
+}
+
+function PrototypeHint() {
+  return (
+    <p className="text-center text-xs font-semibold text-muted">
+      This is a prototype — use the demo account below to continue.
+    </p>
+  )
+}
+
+function Divider() {
+  return (
+    <div className="my-5 flex items-center gap-3">
+      <span className="h-px flex-1 bg-line" aria-hidden="true" />
+      <span className="text-xs font-semibold text-muted">or</span>
+      <span className="h-px flex-1 bg-line" aria-hidden="true" />
     </div>
   )
 }

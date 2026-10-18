@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { PageContainer } from '../../components/layout/PageContainer'
 import { MapView } from '../../components/map/MapView'
 import { CollectionPointMarker } from '../../components/map/CollectionPointMarker'
+import { FitBounds } from '../../components/map/FitBounds'
 import { DepotMarker } from '../../components/map/DepotMarker'
 import { RouteLayer } from '../../components/map/RouteLayer'
 import { RouteLegend } from '../../components/routes/RouteLegend'
+import { RouteStatStrip } from '../../components/routes/RouteStatStrip'
 import { RouteSummaryPanel } from '../../components/routes/RouteSummaryPanel'
 import { RouteResultPanel } from '../../components/routes/RouteResultPanel'
 import { NextStopPanel } from '../../components/routes/NextStopPanel'
@@ -125,7 +127,7 @@ export function Routes() {
   if (!selectedRoute) {
     return (
       <PageContainer>
-        <p className="text-sm text-muted">Loading today&rsquo;s route&hellip;</p>
+        <p className="text-sm font-semibold text-muted">Loading today&rsquo;s route&hellip;</p>
       </PageContainer>
     )
   }
@@ -142,12 +144,14 @@ export function Routes() {
   const orderedCollected = orderedStops?.filter((point) => point.status === 'collected').length ?? 0
 
   return (
-    <PageContainer>
+    <PageContainer className="max-w-7xl">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Today&rsquo;s Route</h1>
-          <p className="mt-1 text-sm text-muted">
-            {selectedRoute.name} &middot; {selectedRoute.vehicle}
+          <h1 className="text-3xl font-extrabold text-ink">Today&rsquo;s Route</h1>
+          <p className="mt-1 text-sm font-semibold text-muted">
+            {phase === 'collecting'
+              ? `${selectedRoute.name} · ${selectedRoute.vehicle}`
+              : 'Select and optimize the best route for collection.'}
           </p>
         </div>
         {routes && routes.length > 1 && phase !== 'collecting' && (
@@ -155,7 +159,7 @@ export function Routes() {
             aria-label="Choose route"
             value={selectedRoute.routeId}
             onChange={(event) => handleSelectRoute(event.target.value)}
-            className="rounded-lg border border-ink/10 bg-surface px-3 py-2 text-sm text-ink focus:border-primary focus:outline-none"
+            className="rounded-2xl border border-line bg-surface px-4 py-2.5 text-sm font-bold text-ink shadow-card focus:border-primary focus:outline-none"
           >
             {routes.map((route) => (
               <option key={route.routeId} value={route.routeId}>
@@ -166,8 +170,51 @@ export function Routes() {
         )}
       </header>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
         <div>
+          {phase !== 'collecting' && (
+            <div className="mb-4">
+              <RouteStatStrip summary={summary} />
+            </div>
+          )}
+
+          <div className="relative isolate h-[26rem] overflow-hidden rounded-card border border-line/70 shadow-card sm:h-[32rem] lg:h-[calc(100svh-17rem)] lg:min-h-[32rem]">
+            <MapView>
+              <FitBounds
+                fitKey={selectedRoute.routeId}
+                points={[
+                  [selectedRoute.depot.latitude, selectedRoute.depot.longitude],
+                  ...routePoints.map((point): [number, number] => [point.latitude, point.longitude]),
+                ]}
+              />
+              {routePoints.map((point) => (
+                <CollectionPointMarker
+                  key={point.id}
+                  point={point}
+                  simple
+                  orderLabel={point.status === 'pending' ? orderIndex.get(point.id) : undefined}
+                  highlight={phase === 'collecting' && point.id === nextStop?.id}
+                />
+              ))}
+              <DepotMarker depot={selectedRoute.depot} />
+              {orderedStops && showOriginal && <RouteLayer route={selectedRoute} variant="original" />}
+              {orderedStops && <RouteLayer route={selectedRoute} variant="optimized" />}
+            </MapView>
+            {orderedStops && (
+              <button
+                type="button"
+                onClick={() => setShowOriginal((show) => !show)}
+                aria-pressed={showOriginal}
+                className="tm-press absolute right-3 top-3 z-[400] rounded-full bg-surface px-3.5 py-2 text-xs font-bold text-primary-dark shadow-card hover:bg-sage-soft"
+              >
+                {showOriginal ? 'Hide Original Route' : 'Show Original Route'}
+              </button>
+            )}
+          </div>
+          <RouteLegend showOriginal={Boolean(orderedStops) && showOriginal} />
+        </div>
+
+        <div className="space-y-5">
           {phase === 'plan' && (
             <RouteSummaryPanel
               summary={summary}
@@ -195,48 +242,20 @@ export function Routes() {
                 distanceAwayKm={distanceAwayKm}
                 onMarkCollected={handleMarkCollected}
               />
-              <div className="mt-8">
-                <RouteStopList stops={orderedStops} nextStopId={nextStop?.id ?? null} />
-              </div>
+              <RouteStopList stops={orderedStops} nextStopId={nextStop?.id ?? null} />
               {nextStop && (
                 <button
                   type="button"
                   onClick={handleOptimize}
                   disabled={isOptimizing}
-                  className="mt-4 text-sm font-medium text-muted underline-offset-2 hover:text-ink hover:underline disabled:opacity-50"
+                  className="w-full rounded-2xl py-2 text-sm font-bold text-muted transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-50"
                 >
                   {isOptimizing ? 'Recalculating…' : 'Recalculate remaining route'}
                 </button>
               )}
-              {optimizeError && <p className="mt-2 text-sm text-[#D97706]">{optimizeError}</p>}
+              {optimizeError && <p className="text-sm font-semibold text-[#b9731d]">{optimizeError}</p>}
             </>
           )}
-        </div>
-
-        <div className="relative h-[420px] overflow-hidden rounded-card border border-ink/10 lg:h-auto lg:min-h-[560px]">
-          <MapView>
-            {routePoints.map((point) => (
-              <CollectionPointMarker
-                key={point.id}
-                point={point}
-                simple
-                orderLabel={point.status === 'pending' ? orderIndex.get(point.id) : undefined}
-              />
-            ))}
-            <DepotMarker depot={selectedRoute.depot} />
-            {orderedStops && showOriginal && <RouteLayer route={selectedRoute} variant="original" />}
-            {orderedStops && <RouteLayer route={selectedRoute} variant="optimized" />}
-          </MapView>
-          {orderedStops && (
-            <button
-              type="button"
-              onClick={() => setShowOriginal((show) => !show)}
-              className="absolute right-3 top-3 z-[400] rounded-lg bg-surface/95 px-3 py-1.5 text-xs font-medium text-ink shadow hover:text-primary-dark"
-            >
-              {showOriginal ? 'Hide Original Route' : 'Show Original Route'}
-            </button>
-          )}
-          <RouteLegend showOriginal={Boolean(orderedStops) && showOriginal} />
         </div>
       </div>
     </PageContainer>

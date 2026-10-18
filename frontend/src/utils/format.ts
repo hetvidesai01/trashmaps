@@ -20,3 +20,11 @@ export function formatReportedTime(iso: string): string {
   if (isToday) return `Today, ${time}`
   return `${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${time}`
 }
+
+/** "14 Oct 2026, 10:24 AM" — full date used on report cards. */
+export function formatReportDate(iso: string): string {
+  const date = new Date(iso)
+  const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  return `${day}, ${time}`
+}

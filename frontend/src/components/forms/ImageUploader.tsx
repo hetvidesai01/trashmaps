@@ -46,33 +46,35 @@ export function ImageUploader({ onImageChange }: ImageUploaderProps) {
         type="file"
         accept="image/*"
         onChange={handleFileChange}
-        className="hidden"
+        className="sr-only"
         id="report-image"
       />
 
       {previewUrl ? (
-        <div className="relative mt-1.5 overflow-hidden rounded-lg border border-ink/10">
-          <img src={previewUrl} alt="Selected waste photo preview" className="h-40 w-full object-cover" />
+        <div className="tm-pop relative overflow-hidden rounded-2xl border border-line">
+          <img src={previewUrl} alt="Selected waste photo preview" className="h-44 w-full object-cover" />
           <button
             type="button"
             onClick={handleRemove}
             aria-label="Remove photo"
-            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-ink/70 text-white hover:bg-ink"
+            className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-ink/70 text-white transition-colors hover:bg-ink"
           >
-            <X size={14} />
+            <X size={15} />
           </button>
         </div>
       ) : (
         <label
           htmlFor="report-image"
-          className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 py-8 text-sm text-muted transition-colors hover:border-primary/40 hover:text-primary-dark"
+          className="tm-press flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-line bg-sage-soft/50 py-8 text-sm font-bold text-muted hover:border-primary/40 hover:text-primary-dark focus-within:border-primary"
         >
-          <Camera size={17} />
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-card">
+            <Camera size={20} />
+          </span>
           Add a photo
         </label>
       )}
 
-      {error && <p className="mt-1.5 text-xs text-[#D97706]">{error}</p>}
+      {error && <p className="mt-1.5 text-xs font-semibold text-[#b9731d]">{error}</p>}
     </div>
   )
 }

@@ -26,14 +26,12 @@ export function StatusBadge(props: StatusBadgeProps) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium"
+      className="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-bold"
       style={{
         color,
-        borderColor: `color-mix(in srgb, ${color} 35%, transparent)`,
-        backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
+        backgroundColor: `color-mix(in srgb, ${color} 15%, white)`,
       }}
     >
-      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
       {label}
     </span>
   )

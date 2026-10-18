@@ -3,53 +3,64 @@ import { RotateCcw } from 'lucide-react'
 import { resetDemoData } from '../../services/mock/storage'
 
 interface ResetDemoButtonProps {
-  iconColorClassName?: string
+  /** Classes for the trigger button (colour/size). */
+  className?: string
+  /** Where the confirmation popover sits relative to the trigger. */
+  popoverClassName?: string
+  label?: string
 }
 
 /**
  * Prototype-only utility: clears persisted demo state and reloads, so a
  * faculty demo can be repeated from a clean slate without a real backend.
  */
-export function ResetDemoButton({ iconColorClassName = 'text-white/50' }: ResetDemoButtonProps) {
+export function ResetDemoButton({
+  className = 'h-9 w-9 text-muted hover:bg-ink/5 hover:text-ink',
+  popoverClassName = 'right-0 top-full mt-2',
+  label,
+}: ResetDemoButtonProps) {
   const [isConfirming, setIsConfirming] = useState(false)
 
-  if (isConfirming) {
-    return (
-      <div className="absolute right-0 top-full z-[600] mt-2 w-60 rounded-lg border border-ink/10 bg-surface p-3 text-left shadow-xl">
-        <p className="text-xs text-ink">Reset all demo data back to the starting dataset?</p>
-        <p className="mt-1 text-xs text-muted">This clears submitted reports and approvals.</p>
-        <div className="mt-3 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => setIsConfirming(false)}
-            className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted hover:bg-ink/5 hover:text-ink"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              resetDemoData()
-              window.location.reload()
-            }}
-            className="rounded-lg bg-primary px-2.5 py-1.5 text-xs font-medium text-white hover:bg-primary-dark"
-          >
-            Reset
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <button
-      type="button"
-      onClick={() => setIsConfirming(true)}
-      aria-label="Reset demo data"
-      title="Reset demo data"
-      className={`flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 hover:text-white ${iconColorClassName}`}
-    >
-      <RotateCcw size={15} />
-    </button>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsConfirming((open) => !open)}
+        aria-label="Reset demo data"
+        title="Reset demo data"
+        className={`flex items-center justify-center gap-2 rounded-xl transition-colors ${className}`}
+      >
+        <RotateCcw size={15} />
+        {label}
+      </button>
+
+      {isConfirming && (
+        <div
+          className={`absolute z-[950] w-64 rounded-2xl border border-line bg-surface p-4 text-left shadow-lift ${popoverClassName}`}
+        >
+          <p className="text-sm font-semibold text-ink">Reset all demo data back to the starting dataset?</p>
+          <p className="mt-1 text-xs text-muted">This clears submitted reports and approvals.</p>
+          <div className="mt-3 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setIsConfirming(false)}
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-muted hover:bg-ink/5 hover:text-ink"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                resetDemoData()
+                window.location.reload()
+              }}
+              className="rounded-xl bg-primary-dark px-3 py-1.5 text-xs font-bold text-white hover:bg-primary"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

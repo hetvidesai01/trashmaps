@@ -35,7 +35,7 @@ export function PointStatusLegend({ showOptimized = false }: PointStatusLegendPr
           Collected
         </li>
         <li className="flex items-center gap-2 text-xs text-ink">
-          <span className="h-2 w-2 rotate-45" style={{ backgroundColor: CITIZEN_SOURCE_COLOR }} />
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CITIZEN_SOURCE_COLOR }} />
           Citizen added
         </li>
         <li className="flex items-center gap-2 text-xs text-ink">

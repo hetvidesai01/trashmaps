@@ -2,46 +2,44 @@ import { divIcon } from 'leaflet'
 import { STATUS_COLOR, CITIZEN_SOURCE_COLOR } from '../../constants/status'
 import type { CollectionPoint } from '../../types'
 
-const CHECK_SVG = `<svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`
+const SHADOW = 'box-shadow:0 2px 6px rgba(25,45,35,0.35)'
 
-// Requires collection: solid, filled circle — reads as "needs attention now"
-const SOLID_CIRCLE = (color: string) =>
-  `<span style="display:block;width:14px;height:14px;border-radius:9999px;background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`
+const CHECK_SVG = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`
 
-// Skipped: hollow, faded ring — reads as "present but inactive"
-const FADED_RING = (color: string) =>
-  `<span style="display:block;width:14px;height:14px;border-radius:9999px;background:white;border:2.5px solid ${color};opacity:0.6"></span>`
+const PERSON_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c0-4.400 3.600-7 8-7s8 2.600 8 7Z"/></svg>`
 
-// Collected: filled circle with a check mark — reads as "done"
-const CHECK_CIRCLE = (color: string) =>
-  `<span style="display:flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:9999px;background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35)">${CHECK_SVG}</span>`
+const TRUCK_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1"/><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`
 
-// Citizen-added: diamond — reads as "additional, not part of the original set"
-const DIAMOND_HTML = (color: string) =>
-  `<span style="display:block;width:12px;height:12px;transform:rotate(45deg);background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`
-
-// Numbered variants — used for stops in the currently optimized sequence.
+// Stop to collect, in route order — solid green numbered circle.
 const NUMBERED_CIRCLE = (color: string, order: number) =>
-  `<span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:9999px;background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);color:white;font:700 10px/1 Inter,sans-serif">${order}</span>`
+  `<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:${color};border:2.5px solid white;${SHADOW};color:white;font:800 12px/1 Nunito,sans-serif">${order}</span>`
 
-const NUMBERED_DIAMOND = (color: string, order: number) =>
-  `<span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;transform:rotate(45deg);background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"><span style="display:block;transform:rotate(-45deg);color:white;font:700 9px/1 Inter,sans-serif">${order}</span></span>`
+// Stop to collect, no sequence yet.
+const SOLID_CIRCLE = (color: string) =>
+  `<span style="display:block;width:18px;height:18px;border-radius:9999px;background:${color};border:2.5px solid white;${SHADOW}"></span>`
 
-export function pointIcon(point: CollectionPoint, orderLabel?: number) {
-  if (point.source === 'citizen') {
-    if (orderLabel != null) {
-      return divIcon({
-        className: '',
-        html: NUMBERED_DIAMOND(CITIZEN_SOURCE_COLOR, orderLabel),
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
-      })
-    }
+// Skipped — quiet grey ring so it recedes behind active stops.
+const MUTED_CIRCLE = (color: string) =>
+  `<span style="display:block;width:18px;height:18px;border-radius:9999px;background:${color};border:2.5px solid white;opacity:0.55"></span>`
+
+// Collected — soft green with a check.
+const CHECK_CIRCLE = (color: string) =>
+  `<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:9999px;background:${color};border:2.5px solid white;${SHADOW}">${CHECK_SVG}</span>`
+
+// Citizen report — orange circle, with the stop number once sequenced.
+const CITIZEN_CIRCLE = (order?: number) =>
+  `<span style="display:flex;align-items:center;justify-content:center;width:${order != null ? 28 : 24}px;height:${order != null ? 28 : 24}px;border-radius:9999px;background:${CITIZEN_SOURCE_COLOR};border:2.5px solid white;${SHADOW};color:white;font:800 12px/1 Nunito,sans-serif">${order != null ? order : PERSON_SVG}</span>`
+
+export function pointIcon(point: CollectionPoint, orderLabel?: number, highlight = false) {
+  const className = `tm-marker${highlight ? ' tm-marker-next' : ''}`
+
+  if (point.source === 'citizen' && point.status !== 'collected') {
+    const size = orderLabel != null ? 28 : 24
     return divIcon({
-      className: '',
-      html: DIAMOND_HTML(CITIZEN_SOURCE_COLOR),
-      iconSize: [14, 14],
-      iconAnchor: [7, 7],
+      className,
+      html: CITIZEN_CIRCLE(orderLabel),
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
     })
   }
 
@@ -49,40 +47,40 @@ export function pointIcon(point: CollectionPoint, orderLabel?: number) {
 
   if (orderLabel != null) {
     return divIcon({
-      className: '',
+      className,
       html: NUMBERED_CIRCLE(color, orderLabel),
-      iconSize: [20, 20],
-      iconAnchor: [10, 10],
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
     })
   }
 
-  const html =
-    point.status === 'skipped'
-      ? FADED_RING(color)
-      : point.status === 'collected'
-        ? CHECK_CIRCLE(color)
-        : SOLID_CIRCLE(color)
+  if (point.status === 'collected') {
+    return divIcon({ className, html: CHECK_CIRCLE(color), iconSize: [22, 22], iconAnchor: [11, 11] })
+  }
 
-  return divIcon({ className: '', html, iconSize: [14, 14], iconAnchor: [7, 7] })
+  return divIcon({
+    className,
+    html: point.status === 'skipped' ? MUTED_CIRCLE(color) : SOLID_CIRCLE(color),
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+  })
 }
-
-const HOME_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>`
 
 export function depotIcon() {
   return divIcon({
-    className: '',
-    html: `<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:#145C38;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)">${HOME_SVG}</span>`,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
+    className: 'tm-marker',
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:#194d3c;border:2.5px solid white;${SHADOW}">${TRUCK_SVG}</span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
   })
 }
 
 /** Marker used while a citizen is choosing a report's location on the map. */
 export function citizenPinIcon() {
   return divIcon({
-    className: '',
-    html: `<span style="display:block;width:18px;height:18px;transform:rotate(45deg);background:${CITIZEN_SOURCE_COLOR};border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></span>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
+    className: 'tm-marker',
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:${CITIZEN_SOURCE_COLOR};border:3px solid white;${SHADOW}">${PERSON_SVG}</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
   })
 }

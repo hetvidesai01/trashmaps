@@ -1,29 +1,29 @@
 import type { LucideIcon } from 'lucide-react'
-import { Card } from './Card'
+
+export type StatTone = 'sky' | 'sage' | 'stone' | 'peach'
 
 interface StatCardProps {
-  icon: LucideIcon
   label: string
   value: number | string
-  accentColor: string
+  tone: StatTone
+  icon?: LucideIcon
 }
 
-export function StatCard({ icon: Icon, label, value, accentColor }: StatCardProps) {
+const TONES: Record<StatTone, { bg: string; text: string }> = {
+  sky: { bg: 'bg-tint-sky', text: 'text-[#3d6f9e]' },
+  sage: { bg: 'bg-tint-sage', text: 'text-primary' },
+  stone: { bg: 'bg-tint-stone', text: 'text-[#5c6760]' },
+  peach: { bg: 'bg-tint-peach', text: 'text-status-citizen' },
+}
+
+/** Pastel number tile — the dashboard's headline statistics. */
+export function StatCard({ label, value, tone, icon: Icon }: StatCardProps) {
+  const palette = TONES[tone]
   return (
-    <Card className="p-5">
-      <span
-        className="flex h-9 w-9 items-center justify-center rounded-lg"
-        style={{
-          backgroundColor: `color-mix(in srgb, ${accentColor} 14%, transparent)`,
-          color: accentColor,
-        }}
-      >
-        <Icon size={18} strokeWidth={2} />
-      </span>
-      <p className="mt-3 font-display text-3xl font-semibold" style={{ color: accentColor }}>
-        {value}
-      </p>
-      <p className="mt-1 text-xs text-muted">{label}</p>
-    </Card>
+    <div className={`rounded-card px-4 py-5 text-center ${palette.bg}`}>
+      {Icon && <Icon size={16} className={`mx-auto mb-1 ${palette.text}`} strokeWidth={2.25} />}
+      <p className={`font-display text-4xl font-semibold leading-none ${palette.text}`}>{value}</p>
+      <p className={`mt-2 text-xs font-bold leading-tight ${palette.text}`}>{label}</p>
+    </div>
   )
 }

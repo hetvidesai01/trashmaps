@@ -33,8 +33,36 @@ separate navigation and route access:
   optimization logic were left untouched — this phase only added the auth
   shell and role-based navigation around the existing app.
 
-**Not yet done:** map UX redesign, multilingual UI, real backend
-authentication (see below).
+**Visual redesign (reference-driven).** The whole UI follows
+`references/trashmaps-ui-reference.png.png` — the primary visual source of truth.
+Logic, routes, guards, services, and localStorage persistence were not changed;
+only presentation. Key conventions:
+
+- **Tokens** live in `frontend/src/index.css` (`@theme`): forest greens
+  (`primary` #176B4D, `primary-dark` #194D3C), cream `bg`/`surface`, `sage`
+  tints, pastel `tint-*` stat colours, `status-*` marker colours (citizen
+  orange, skipped grey), `rounded-card`, `shadow-card/lift/button`. Use these
+  utilities instead of raw hex values. Fonts: Fraunces (`font-display`, big
+  numbers and wordmark only) and Nunito (body/headings).
+- **Layout:** authority = deep-green `Sidebar` (desktop) + `BottomNav` (mobile);
+  citizen/public = `TopBar` (+ `BottomNav` on mobile). `AppLayout` picks one.
+- **Illustrations** are local SVG React components in
+  `components/illustrations/` (LeafMark, GarbageTruck, RecycleBin,
+  SceneBackdrop, CitizenReporter, Tree/Cypress/Shrub/Leaf/Sparkle). No emoji or
+  external imagery.
+- **Map:** still React Leaflet + OSM tiles (softened with a CSS filter in
+  `index.css`). Markers: numbered green = stop to collect, orange = citizen
+  report, muted grey = skipped, truck tile = depot. The route map frames itself
+  with `FitBounds`. Legend sits *under* the map, never over it.
+- **Motion:** CSS only (`tm-rise`, `tm-pop`, `tm-press`, progress-bar width
+  transition, next-stop marker pulse); all disabled by `prefers-reduced-motion`.
+  Keep the animations on `backwards` fill — `both` leaves a stacking context
+  that traps fixed modals beneath the mobile nav.
+- Shared form styling: `components/forms/fieldStyles.ts`.
+
+**Not yet done:** multilingual UI (the reference's English/हिन्दी/मराठी switch
+is deliberately not rendered until it works), real backend authentication
+(see below).
 
 ## Authentication
 

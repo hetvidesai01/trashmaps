@@ -1,23 +1,50 @@
 @import 'tailwindcss';
 
+/*
+ * TrashMaps design tokens — the single source for the visual language
+ * (extracted from references/trashmaps-ui-reference.png.png). Components use
+ * these utilities (bg-primary, text-ink, rounded-card, shadow-card…) rather
+ * than raw hex values.
+ */
 @theme {
-  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
-  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Nunito', 'Segoe UI', sans-serif;
 
-  --color-primary: #1e7a4c;
-  --color-primary-dark: #145c38;
-  --color-accent: #8bc34a;
-  --color-bg: #f7f9f7;
-  --color-surface: #ffffff;
-  --color-ink: #1e1e1e;
-  --color-muted: #6b7280;
+  /* Greens */
+  --color-primary: #176b4d;
+  --color-primary-dark: #194d3c;
+  --color-forest: #123c2e;
+  --color-accent: #a9d18e;
+  --color-sage: #dcebcf;
+  --color-sage-soft: #eaf2df;
 
-  --color-status-requires: #d97706;
-  --color-status-skipped: #9ca3af;
-  --color-status-collected: #1e7a4c;
-  --color-status-citizen: #7c3aed;
+  /* Neutrals */
+  --color-bg: #f7f6f0;
+  --color-surface: #fdfcf8;
+  --color-line: #e8e6d9;
+  --color-ink: #24352e;
+  --color-muted: #6d8077;
 
-  --radius-card: 0.875rem;
+  /* Pastel stat tints */
+  --color-tint-sky: #dde9f4;
+  --color-tint-sage: #dcebcf;
+  --color-tint-stone: #e9eae3;
+  --color-tint-peach: #fbe5d0;
+  --color-amber: #e7a65b;
+  --color-sun: #f2c14e;
+
+  /* Collection state colours (map markers, badges) */
+  --color-status-requires: #176b4d;
+  --color-status-skipped: #a3a99f;
+  --color-status-collected: #6fae7c;
+  --color-status-citizen: #e07b2f;
+
+  --radius-card: 1.25rem;
+  --radius-tile: 1rem;
+
+  --shadow-card: 0 1px 2px rgba(36, 53, 46, 0.04), 0 10px 28px rgba(36, 53, 46, 0.06);
+  --shadow-lift: 0 2px 4px rgba(36, 53, 46, 0.06), 0 16px 36px rgba(36, 53, 46, 0.12);
+  --shadow-button: 0 6px 16px rgba(25, 77, 60, 0.22);
 }
 
 body {
@@ -33,11 +60,214 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-weight: 800;
   letter-spacing: -0.01em;
 }
 
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* ---------- Leaflet theming (still real OpenStreetMap tiles) ---------- */
+
+.leaflet-container {
+  font-family: var(--font-body);
+  background: #e8eddd;
+}
+
+/* Soften OSM into the cream/green palette without swapping the tile source. */
+.leaflet-tile-pane {
+  filter: saturate(0.55) sepia(0.16) hue-rotate(-8deg) brightness(1.04) contrast(0.95);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 1rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.leaflet-popup-tip {
+  background: var(--color-surface);
+}
+
+.leaflet-bar {
+  border: none !important;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.leaflet-bar a {
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  border-bottom-color: var(--color-line);
+}
+
+.leaflet-control-attribution {
+  background: rgba(253, 252, 248, 0.8) !important;
+  font-size: 10px;
+}
+
+/* ---------- Map markers ---------- */
+
+.tm-marker > span {
+  transition: transform 0.18s ease;
+}
+
+.tm-marker:hover > span {
+  transform: scale(1.14);
+}
+
+.tm-marker-next > span {
+  animation: tm-marker-pulse 1.8s ease-out infinite;
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes tm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tm-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes tm-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes tm-draw {
+  from {
+    stroke-dashoffset: 30;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tm-sway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+@keyframes tm-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes tm-marker-pulse {
+  0% {
+    box-shadow:
+      0 1px 4px rgba(0, 0, 0, 0.35),
+      0 0 0 0 rgba(23, 107, 77, 0.5);
+  }
+  100% {
+    box-shadow:
+      0 1px 4px rgba(0, 0, 0, 0.35),
+      0 0 0 12px rgba(23, 107, 77, 0);
+  }
+}
+
+.tm-rise {
+  animation: tm-rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.tm-fade {
+  animation: tm-fade 0.3s ease backwards;
+}
+
+.tm-pop {
+  animation: tm-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.tm-ring {
+  animation: tm-ring 1.1s ease-out both;
+}
+
+.tm-sway {
+  transform-origin: 50% 100%;
+  animation: tm-sway 5s ease-in-out infinite;
+}
+
+.tm-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tm-twinkle 2.4s ease-in-out infinite;
+}
+
+/* Hover / press feedback shared by cards and buttons. */
+.tm-press {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.tm-press:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.tm-press:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
