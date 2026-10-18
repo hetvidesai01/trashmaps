@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes as RouterRoutes, Route } from 'react-router-dom'
+import { BrowserRouter, Navigate, Routes as RouterRoutes, Route } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { RequireRole } from './components/auth/RequireRole'
@@ -39,6 +39,8 @@ function App() {
               </Route>
             </Route>
           </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </RouterRoutes>
       </BrowserRouter>
     </AuthProvider>

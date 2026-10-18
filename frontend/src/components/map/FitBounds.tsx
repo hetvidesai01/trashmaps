@@ -17,9 +17,13 @@ interface FitBoundsProps {
 export function FitBounds({ points, fitKey }: FitBoundsProps) {
   const map = useMap()
   const pointsRef = useRef(points)
-  pointsRef.current = points
   const userMoved = useRef(false)
   const programmatic = useRef(false)
+
+  // Declared before the fit effect so it always reads the latest points.
+  useEffect(() => {
+    pointsRef.current = points
+  })
 
   useEffect(() => {
     function fit() {
