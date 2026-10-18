@@ -38,7 +38,7 @@ export function MyReports() {
             role="tab"
             aria-selected={filter === item.id}
             onClick={() => setFilter(item.id)}
-            className={`tm-press shrink-0 rounded-full px-4 py-2 text-sm font-bold ${
+            className={`tm-press min-h-11 shrink-0 rounded-full px-4 py-2 text-sm font-bold ${
               filter === item.id ? 'bg-primary-dark text-white shadow-button' : 'bg-surface text-muted hover:text-ink'
             }`}
           >

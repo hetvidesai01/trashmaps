@@ -15,7 +15,7 @@ interface ResetDemoButtonProps {
  * faculty demo can be repeated from a clean slate without a real backend.
  */
 export function ResetDemoButton({
-  className = 'h-9 w-9 text-muted hover:bg-ink/5 hover:text-ink',
+  className = 'h-11 w-11 text-muted hover:bg-ink/5 hover:text-ink',
   popoverClassName = 'right-0 top-full mt-2',
   label,
 }: ResetDemoButtonProps) {

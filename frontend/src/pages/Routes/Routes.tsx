@@ -6,6 +6,7 @@ import { FitBounds } from '../../components/map/FitBounds'
 import { DepotMarker } from '../../components/map/DepotMarker'
 import { RouteLayer } from '../../components/map/RouteLayer'
 import { RouteLegend } from '../../components/routes/RouteLegend'
+import { MobileRouteSheet } from '../../components/routes/MobileRouteSheet'
 import { RouteStatStrip } from '../../components/routes/RouteStatStrip'
 import { RouteSummaryPanel } from '../../components/routes/RouteSummaryPanel'
 import { RouteResultPanel } from '../../components/routes/RouteResultPanel'
@@ -143,9 +144,25 @@ export function Routes() {
   const distanceAwayKm = nextStop ? straightLineKm(previousStop, nextStop) : null
   const orderedCollected = orderedStops?.filter((point) => point.status === 'collected').length ?? 0
 
+  const routeSelect =
+    routes && routes.length > 1 && phase !== 'collecting' ? (
+      <select
+        aria-label="Choose route"
+        value={selectedRoute.routeId}
+        onChange={(event) => handleSelectRoute(event.target.value)}
+        className="min-h-11 w-full rounded-2xl border border-line bg-surface px-4 py-2.5 text-sm font-bold text-ink shadow-card focus:border-primary focus:outline-none lg:w-auto"
+      >
+        {routes.map((route) => (
+          <option key={route.routeId} value={route.routeId}>
+            {route.name}
+          </option>
+        ))}
+      </select>
+    ) : null
+
   return (
     <PageContainer className="max-w-7xl">
-      <header className="flex flex-wrap items-end justify-between gap-3">
+      <header className="hidden flex-wrap items-end justify-between gap-3 lg:flex">
         <div>
           <h1 className="text-3xl font-extrabold text-ink">Today&rsquo;s Route</h1>
           <p className="mt-1 text-sm font-semibold text-muted">
@@ -154,31 +171,19 @@ export function Routes() {
               : 'Select and optimize the best route for collection.'}
           </p>
         </div>
-        {routes && routes.length > 1 && phase !== 'collecting' && (
-          <select
-            aria-label="Choose route"
-            value={selectedRoute.routeId}
-            onChange={(event) => handleSelectRoute(event.target.value)}
-            className="rounded-2xl border border-line bg-surface px-4 py-2.5 text-sm font-bold text-ink shadow-card focus:border-primary focus:outline-none"
-          >
-            {routes.map((route) => (
-              <option key={route.routeId} value={route.routeId}>
-                {route.name}
-              </option>
-            ))}
-          </select>
-        )}
+        {routeSelect}
       </header>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
+      <div className="lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start lg:gap-5">
         <div>
           {phase !== 'collecting' && (
-            <div className="mb-4">
+            <div className="mb-4 hidden lg:block">
               <RouteStatStrip summary={summary} />
             </div>
           )}
 
-          <div className="relative isolate h-[26rem] overflow-hidden rounded-card border border-line/70 shadow-card sm:h-[32rem] lg:h-[calc(100svh-17rem)] lg:min-h-[32rem]">
+          {/* Phones: the map fills the screen above the tab bar. Desktop: a framed card. */}
+          <div className="tm-route-map fixed inset-x-0 top-0 bottom-[var(--bottom-nav-h)] z-0 isolate overflow-hidden lg:relative lg:inset-auto lg:h-[calc(100svh-17rem)] lg:min-h-[32rem] lg:rounded-card lg:border lg:border-line/70 lg:shadow-card">
             <MapView>
               <FitBounds
                 fitKey={selectedRoute.routeId}
@@ -200,21 +205,34 @@ export function Routes() {
               {orderedStops && showOriginal && <RouteLayer route={selectedRoute} variant="original" />}
               {orderedStops && <RouteLayer route={selectedRoute} variant="optimized" />}
             </MapView>
+
+            <div className="pointer-events-none absolute inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[400] lg:hidden">
+              <div className="pointer-events-auto mx-auto max-w-2xl rounded-2xl bg-surface/95 px-4 py-2.5 shadow-card">
+                <h1 className="text-base font-extrabold leading-tight text-ink">Today&rsquo;s Route</h1>
+                <p className="truncate text-xs font-semibold text-muted">
+                  {selectedRoute.name} &middot; {selectedRoute.vehicle}
+                </p>
+              </div>
+            </div>
+
             {orderedStops && (
               <button
                 type="button"
                 onClick={() => setShowOriginal((show) => !show)}
                 aria-pressed={showOriginal}
-                className="tm-press absolute right-3 top-3 z-[400] rounded-full bg-surface px-3.5 py-2 text-xs font-bold text-primary-dark shadow-card hover:bg-sage-soft"
+                className="tm-press absolute right-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+4rem)] z-[400] min-h-11 rounded-full bg-surface px-4 text-xs font-bold text-primary-dark shadow-card hover:bg-sage-soft lg:top-3"
               >
                 {showOriginal ? 'Hide Original Route' : 'Show Original Route'}
               </button>
             )}
           </div>
-          <RouteLegend showOriginal={Boolean(orderedStops) && showOriginal} />
+
+          <div className="hidden lg:block">
+            <RouteLegend showOriginal={Boolean(orderedStops) && showOriginal} />
+          </div>
         </div>
 
-        <div className="space-y-5">
+        <div className="hidden space-y-5 lg:block">
           {phase === 'plan' && (
             <RouteSummaryPanel
               summary={summary}
@@ -248,7 +266,7 @@ export function Routes() {
                   type="button"
                   onClick={handleOptimize}
                   disabled={isOptimizing}
-                  className="w-full rounded-2xl py-2 text-sm font-bold text-muted transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-50"
+                  className="min-h-11 w-full rounded-2xl py-2 text-sm font-bold text-muted transition-colors hover:bg-ink/5 hover:text-ink disabled:opacity-50"
                 >
                   {isOptimizing ? 'Recalculating…' : 'Recalculate remaining route'}
                 </button>
@@ -258,6 +276,24 @@ export function Routes() {
           )}
         </div>
       </div>
+
+      <MobileRouteSheet
+        phase={phase}
+        route={selectedRoute}
+        summary={summary}
+        orderedStops={orderedStops}
+        nextStop={nextStop}
+        nextStopIndex={nextStopIndex}
+        orderedCollected={orderedCollected}
+        distanceAwayKm={distanceAwayKm}
+        isOptimizing={isOptimizing}
+        error={optimizeError}
+        showOriginal={showOriginal}
+        routeSelect={routeSelect}
+        onOptimize={handleOptimize}
+        onStart={() => setStartedRouteIds((ids) => [...ids, selectedRoute.routeId])}
+        onMarkCollected={handleMarkCollected}
+      />
     </PageContainer>
   )
 }

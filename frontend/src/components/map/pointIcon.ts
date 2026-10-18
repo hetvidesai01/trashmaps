@@ -2,6 +2,13 @@ import { divIcon } from 'leaflet'
 import { STATUS_COLOR, CITIZEN_SOURCE_COLOR } from '../../constants/status'
 import type { CollectionPoint } from '../../types'
 
+// Every marker sits in a 44x44 transparent hit area so it is easy to tap.
+const HIT = 44
+const hit = (inner: string) =>
+  `<div class="tm-hit" style="display:flex;align-items:center;justify-content:center;width:${HIT}px;height:${HIT}px">${inner}</div>`
+const hitIcon = (className: string, inner: string) =>
+  divIcon({ className, html: hit(inner), iconSize: [HIT, HIT], iconAnchor: [HIT / 2, HIT / 2] })
+
 const SHADOW = 'box-shadow:0 2px 6px rgba(25,45,35,0.35)'
 
 const CHECK_SVG = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`
@@ -34,53 +41,27 @@ export function pointIcon(point: CollectionPoint, orderLabel?: number, highlight
   const className = `tm-marker${highlight ? ' tm-marker-next' : ''}`
 
   if (point.source === 'citizen' && point.status !== 'collected') {
-    const size = orderLabel != null ? 28 : 24
-    return divIcon({
-      className,
-      html: CITIZEN_CIRCLE(orderLabel),
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2],
-    })
+    return hitIcon(className, CITIZEN_CIRCLE(orderLabel))
   }
 
   const color = STATUS_COLOR[point.status]
 
-  if (orderLabel != null) {
-    return divIcon({
-      className,
-      html: NUMBERED_CIRCLE(color, orderLabel),
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
-    })
-  }
-
-  if (point.status === 'collected') {
-    return divIcon({ className, html: CHECK_CIRCLE(color), iconSize: [22, 22], iconAnchor: [11, 11] })
-  }
-
-  return divIcon({
-    className,
-    html: point.status === 'skipped' ? MUTED_CIRCLE(color) : SOLID_CIRCLE(color),
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
-  })
+  if (orderLabel != null) return hitIcon(className, NUMBERED_CIRCLE(color, orderLabel))
+  if (point.status === 'collected') return hitIcon(className, CHECK_CIRCLE(color))
+  return hitIcon(className, point.status === 'skipped' ? MUTED_CIRCLE(color) : SOLID_CIRCLE(color))
 }
 
 export function depotIcon() {
-  return divIcon({
-    className: 'tm-marker',
-    html: `<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:#194d3c;border:2.5px solid white;${SHADOW}">${TRUCK_SVG}</span>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
-  })
+  return hitIcon(
+    'tm-marker',
+    `<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:#194d3c;border:2.5px solid white;${SHADOW}">${TRUCK_SVG}</span>`,
+  )
 }
 
 /** Marker used while a citizen is choosing a report's location on the map. */
 export function citizenPinIcon() {
-  return divIcon({
-    className: 'tm-marker',
-    html: `<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:${CITIZEN_SOURCE_COLOR};border:3px solid white;${SHADOW}">${PERSON_SVG}</span>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  })
+  return hitIcon(
+    'tm-marker',
+    `<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:${CITIZEN_SOURCE_COLOR};border:3px solid white;${SHADOW}">${PERSON_SVG}</span>`,
+  )
 }

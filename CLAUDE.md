@@ -60,6 +60,33 @@ only presentation. Key conventions:
   that traps fixed modals beneath the mobile nav.
 - Shared form styling: `components/forms/fieldStyles.ts`.
 
+**Mobile-first experience.** Phones/tablets (< `lg`, 1024px) are designed as an
+app, not a shrunk desktop:
+
+- Both roles get a bottom tab bar (`BottomNav`): citizen = Report Waste / My
+  Reports / Profile; authority = Dashboard / Route / Reports / Profile. Its
+  height is the CSS variable `--bottom-nav-h` (includes the home-indicator safe
+  area) — full-bleed screens position themselves with it. `/profile` is
+  available to both roles (account info, reset demo data, log out).
+- The authority **Route** screen on phones is map-first: the map is fixed
+  full-screen and `MobileRouteSheet` docks above the tab bar. The "peek" shows
+  the one next action per phase (Optimize / Start Route / big Next Stop card +
+  Mark Collected + progress); tap or swipe the handle to expand stats, stop
+  list, legend and route picker. Desktop keeps the side-panel layout; both
+  render from the same state/handlers in `pages/Routes/Routes.tsx`.
+- Touch targets are ≥ 44×44px (`Button` has `min-h-11`; map markers have a 44px
+  transparent hit area). Keep this when adding controls.
+- Safe areas: `viewport-fit=cover`, top-bar and tab-bar pad with `env(safe-area-*)`.
+- Never leave a Leaflet map without `FitBounds`' resize handling on full-bleed
+  layouts — Leaflet caches its container size at init.
+
+**PWA-ready (installable shell only).** `public/manifest.webmanifest`,
+`public/icons/*` (192/512/maskable/apple-touch), and `public/sw.js` (production
+builds only, registered in `main.tsx`): hashed assets cache-first, navigations
+network-first with the cached shell as offline fallback. There is intentionally
+**no** offline data sync, background sync, push notifications, or native
+integration — all data is still the mock services.
+
 **Not yet done:** multilingual UI (the reference's English/हिन्दी/मराठी switch
 is deliberately not rendered until it works), real backend authentication
 (see below).

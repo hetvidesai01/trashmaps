@@ -11,6 +11,7 @@ import { Routes } from './pages/Routes'
 import { CitizenReports } from './pages/CitizenReports'
 import { ReportWaste } from './pages/ReportWaste'
 import { MyReports } from './pages/MyReports'
+import { Profile } from './pages/Profile'
 
 function App() {
   return (
@@ -23,6 +24,8 @@ function App() {
             <Route path="/" element={<Home />} />
 
             <Route element={<RequireAuth />}>
+              <Route path="/profile" element={<Profile />} />
+
               <Route element={<RequireRole role="authority" />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/routes" element={<Routes />} />

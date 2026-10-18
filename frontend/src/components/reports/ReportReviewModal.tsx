@@ -68,7 +68,7 @@ export function ReportReviewModal({ report, onApprove, onReject, onClose }: Repo
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-ink/5 hover:text-ink"
+                className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-ink/5 hover:text-ink"
               >
                 <X size={18} />
               </button>

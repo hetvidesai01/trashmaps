@@ -1,6 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
-import { useAuth } from '../../auth/AuthContext'
+import { NavLink } from 'react-router-dom'
 import type { NavItem } from '../../constants/nav'
 import { NAV_ICONS } from './navIcons'
 
@@ -8,17 +6,16 @@ interface BottomNavProps {
   items: NavItem[]
 }
 
-/** Touch-friendly tab bar shown below the lg breakpoint. */
+/**
+ * Thumb-reach tab bar shown below the lg breakpoint. Its height is exposed as
+ * --bottom-nav-h (index.css) so full-bleed screens can sit exactly above it,
+ * and it pads for the home-indicator safe area.
+ */
 export function BottomNav({ items }: BottomNavProps) {
-  const { logout } = useAuth()
-  const navigate = useNavigate()
-
-  const tab = 'flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-[11px] font-bold'
-
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-[900] flex gap-1 border-t border-line bg-surface px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(36,53,46,0.06)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[900] flex h-[var(--bottom-nav-h)] items-start gap-1 border-t border-line bg-surface px-2 pt-2 shadow-[0_-8px_24px_rgba(36,53,46,0.06)] lg:hidden"
     >
       {items.map((item) => {
         const Icon = NAV_ICONS[item.path]
@@ -27,25 +24,20 @@ export function BottomNav({ items }: BottomNavProps) {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `${tab} transition-colors ${isActive ? 'bg-sage text-primary-dark' : 'text-muted'}`
+              `tm-press flex min-h-[3rem] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[11px] font-bold ${
+                isActive ? 'bg-sage text-primary-dark' : 'text-muted'
+              }`
             }
           >
-            {Icon && <Icon size={21} strokeWidth={2.1} />}
-            {item.label}
+            {({ isActive }) => (
+              <>
+                {Icon && <Icon size={22} strokeWidth={isActive ? 2.4 : 2} />}
+                <span className="max-w-full truncate">{item.label}</span>
+              </>
+            )}
           </NavLink>
         )
       })}
-      <button
-        type="button"
-        onClick={() => {
-          logout()
-          navigate('/login', { replace: true })
-        }}
-        className={`${tab} text-muted`}
-      >
-        <LogOut size={21} strokeWidth={2.1} />
-        Log out
-      </button>
     </nav>
   )
 }

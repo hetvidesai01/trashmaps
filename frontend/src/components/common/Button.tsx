@@ -27,7 +27,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`tm-press inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
+      className={`tm-press inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
       {...props}
     >
       {icon}

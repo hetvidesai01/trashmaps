@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   MessageSquarePlus,
   ClipboardList,
+  UserRound,
 } from 'lucide-react'
 
 export type NavIcon = ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
@@ -15,4 +16,5 @@ export const NAV_ICONS: Record<string, NavIcon> = {
   '/citizen-reports': ClipboardCheck,
   '/report': MessageSquarePlus,
   '/my-reports': ClipboardList,
+  '/profile': UserRound,
 }

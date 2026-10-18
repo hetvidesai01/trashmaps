@@ -15,9 +15,9 @@ export function TopBar() {
   const navigate = useNavigate()
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/95 pt-[env(safe-area-inset-top)] backdrop-blur-sm">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3 lg:px-8">
-        <Link to={role ? ROLE_HOME[role] : '/'} className="flex items-center gap-2.5 text-primary-dark">
+        <Link to={role ? ROLE_HOME[role] : '/'} className="flex min-h-11 items-center gap-2.5 text-primary-dark">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-dark">
             <LeafMark className="h-6 w-6" tone="light" />
           </span>
@@ -49,14 +49,16 @@ export function TopBar() {
         {user ? (
           <div className="flex items-center gap-1">
             <span className="mr-1 hidden text-xs font-semibold text-muted sm:inline">{user.name}</span>
-            <ResetDemoButton />
+            <div className="hidden lg:block">
+              <ResetDemoButton />
+            </div>
             <button
               type="button"
               onClick={() => {
                 logout()
                 navigate('/login', { replace: true })
               }}
-              className="hidden rounded-xl px-3 py-2 text-xs font-bold text-muted transition-colors hover:bg-ink/5 hover:text-ink lg:block"
+              className="hidden min-h-11 rounded-xl px-3 py-2 text-xs font-bold text-muted transition-colors hover:bg-ink/5 hover:text-ink lg:block"
             >
               Log out
             </button>

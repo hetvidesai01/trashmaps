@@ -40,7 +40,7 @@ export function Dashboard() {
 
   return (
     <PageContainer className="max-w-4xl">
-      <header className="flex items-start justify-between gap-4">
+      <header className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-ink">{greeting()}</h1>
           <p className="mt-1 text-sm font-semibold text-muted">Here&rsquo;s today&rsquo;s collection overview.</p>
@@ -87,8 +87,8 @@ export function Dashboard() {
                   />
                 </div>
 
-                <Link to="/routes" className="mt-6 inline-block">
-                  <Button variant="light" className="px-6 py-3.5 text-[15px]">
+                <Link to="/routes" className="mt-6 block sm:inline-block">
+                  <Button variant="light" className="w-full px-6 py-3.5 text-[15px] sm:w-auto">
                     View Today&rsquo;s Route
                     <ArrowRight size={17} />
                   </Button>

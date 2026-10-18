@@ -45,7 +45,7 @@ export function PendingReportCard({ report, onApprove, onReject, onDetails }: Pe
             <button
               type="button"
               onClick={() => onDetails(report)}
-              className="mt-2 text-xs font-bold text-primary underline-offset-2 hover:underline"
+              className="-ml-1 mt-1 inline-flex min-h-11 items-center px-1 text-xs font-bold text-primary underline-offset-2 hover:underline"
             >
               View details
             </button>

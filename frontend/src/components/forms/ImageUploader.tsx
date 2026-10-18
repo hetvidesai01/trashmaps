@@ -57,7 +57,7 @@ export function ImageUploader({ onImageChange }: ImageUploaderProps) {
             type="button"
             onClick={handleRemove}
             aria-label="Remove photo"
-            className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-ink/70 text-white transition-colors hover:bg-ink"
+            className="absolute right-1.5 top-1.5 flex h-11 w-11 items-center justify-center rounded-full bg-ink/70 text-white transition-colors hover:bg-ink"
           >
             <X size={15} />
           </button>

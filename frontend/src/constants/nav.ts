@@ -7,6 +7,7 @@ export const AUTHORITY_PRIMARY_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Route', path: '/routes' },
   { label: 'Reports', path: '/citizen-reports' },
+  { label: 'Profile', path: '/profile' },
 ]
 
 // The waste map (/map) stays routable but is intentionally not in the nav:
@@ -15,4 +16,5 @@ export const AUTHORITY_PRIMARY_NAV: NavItem[] = [
 export const CITIZEN_PRIMARY_NAV: NavItem[] = [
   { label: 'Report Waste', path: '/report' },
   { label: 'My Reports', path: '/my-reports' },
+  { label: 'Profile', path: '/profile' },
 ]

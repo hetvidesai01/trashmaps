@@ -1,0 +1,17 @@
+{
+  "name": "TrashMaps",
+  "short_name": "TrashMaps",
+  "description": "Cleaner cities, smarter waste-collection routes.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f6f0",
+  "theme_color": "#194d3c",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

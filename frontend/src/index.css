@@ -47,6 +47,16 @@
   --shadow-button: 0 6px 16px rgba(25, 77, 60, 0.22);
 }
 
+/* Height of the mobile tab bar incl. the home-indicator safe area. */
+:root {
+  --bottom-nav-h: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   background: var(--color-bg);
@@ -113,15 +123,31 @@ h4 {
 
 /* ---------- Map markers ---------- */
 
-.tm-marker > span {
+.tm-marker .tm-hit > span {
   transition: transform 0.18s ease;
 }
 
-.tm-marker:hover > span {
+.tm-marker:hover .tm-hit > span {
   transform: scale(1.14);
 }
 
-.tm-marker-next > span {
+/* Touch-sized zoom buttons on the small pickers. */
+@media (max-width: 1023px) {
+  .leaflet-touch .leaflet-bar a {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+  }
+}
+
+/* Pinch-zoom is the norm on touch; the +/- buttons only clutter the route map. */
+@media (max-width: 1023px) {
+  .tm-route-map .leaflet-control-zoom {
+    display: none;
+  }
+}
+
+.tm-marker-next .tm-hit > span {
   animation: tm-marker-pulse 1.8s ease-out infinite;
 }
 

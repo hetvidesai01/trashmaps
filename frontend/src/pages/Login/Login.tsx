@@ -234,7 +234,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="mb-4 flex items-center gap-1.5 text-xs font-bold text-muted transition-colors hover:text-ink"
+      className="-mt-2 mb-2 flex min-h-11 items-center gap-1.5 text-xs font-bold text-muted transition-colors hover:text-ink"
     >
       <ArrowLeft size={14} />
       Back
