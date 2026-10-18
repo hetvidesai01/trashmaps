@@ -2,10 +2,10 @@ interface GarbageTruckProps {
   className?: string
 }
 
-/** Green waste-collection truck with a yellow cab, facing right. */
-export function GarbageTruck({ className = 'h-auto w-full' }: GarbageTruckProps) {
+/** Raw truck shapes in a 300x170 coordinate space, for embedding in other SVGs. */
+export function TruckShapes() {
   return (
-    <svg viewBox="0 0 300 170" className={className} fill="none" role="img" aria-label="Waste collection truck">
+    <>
       <ellipse cx="152" cy="150" rx="128" ry="8" fill="#0f3a2a" opacity="0.16" />
 
       {/* Rear loader + compactor body */}
@@ -46,6 +46,15 @@ export function GarbageTruck({ className = 'h-auto w-full' }: GarbageTruckProps)
         <circle cx="214" cy="130" r="9" fill="#c9d3cc" />
         <circle cx="214" cy="130" r="3.500" fill="#7a8a82" />
       </g>
+    </>
+  )
+}
+
+/** Green waste-collection truck with a yellow cab, facing right. */
+export function GarbageTruck({ className = 'h-auto w-full' }: GarbageTruckProps) {
+  return (
+    <svg viewBox="0 0 300 170" className={className} fill="none" role="img" aria-label="Waste collection truck">
+      <TruckShapes />
     </svg>
   )
 }

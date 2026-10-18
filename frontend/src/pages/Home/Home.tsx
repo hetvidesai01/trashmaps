@@ -1,14 +1,20 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { PageContainer } from '../../components/layout/PageContainer'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_HOME } from '../../auth/roleHome'
 import { RouteArt } from './RouteArt'
+import { Landing } from '../Landing'
 
 const STEPS = ['Normal route', 'Skip stops that don’t need pickup', 'Add citizen reports', 'Shorter route']
 
 export function Home() {
   const { role } = useAuth()
+  const navigate = useNavigate()
+
+  if (!role) {
+    return <Landing onSelect={(chosen) => navigate('/login', { state: { mode: chosen } })} />
+  }
 
   return (
     <PageContainer>

@@ -48,7 +48,7 @@ only presentation. Key conventions:
   citizen/public = `TopBar` (+ `BottomNav` on mobile). `AppLayout` picks one.
 - **Illustrations** are local SVG React components in
   `components/illustrations/` (LeafMark, GarbageTruck, RecycleBin,
-  SceneBackdrop, CitizenReporter, Tree/Cypress/Shrub/Leaf/Sparkle). No emoji or
+  AnimatedScene, CitizenReporter, Tree/Cypress/Shrub/Leaf/Sparkle). No emoji or
   external imagery.
 - **Map:** still React Leaflet + OSM tiles (softened with a CSS filter in
   `index.css`). Markers: numbered green = stop to collect, orange = citizen
@@ -59,6 +59,17 @@ only presentation. Key conventions:
   Keep the animations on `backwards` fill — `both` leaves a stacking context
   that traps fixed modals beneath the mobile nav.
 - Shared form styling: `components/forms/fieldStyles.ts`.
+
+**Animated landing (`pages/Landing`).** The signed-out entry screen — shown at
+`/` and at `/login` (choice step) — is an animated eco-city scene
+(`AnimatedScene`: drifting clouds, swaying trees, floating leaves, a truck
+driving the road; the composition is chosen by viewport shape via `.tm-scene-*`
+in `index.css`) with two large `RoleCard`s (Authority / Citizen). Cards only
+choose which existing login form opens (`/` passes the choice via router state
+`{ mode }`); sign-in itself is unchanged in `pages/Login`. Ambient loops use the
+`tm-cloud/tm-drive/tm-leaf/tm-bob/tm-dash/tm-sway` classes, which
+`prefers-reduced-motion` turns off (leaving a still illustration). Signed-out
+`/` renders without the TopBar (see `AppLayout`).
 
 **Mobile-first experience.** Phones/tablets (< `lg`, 1024px) are designed as an
 app, not a shrunk desktop:

@@ -2,14 +2,16 @@ import { Cypress, Shrub, Tree } from './Foliage'
 
 interface CitizenReporterProps {
   className?: string
+  /** 'slice' fills the box (crops); 'meet' keeps the whole figure visible. */
+  fit?: 'slice' | 'meet'
 }
 
 /** A resident in a green jacket spotting waste and reporting it on their phone. */
-export function CitizenReporter({ className = 'h-full w-full' }: CitizenReporterProps) {
+export function CitizenReporter({ className = 'h-full w-full', fit = 'slice' }: CitizenReporterProps) {
   return (
     <svg
       viewBox="0 0 360 220"
-      preserveAspectRatio="xMidYMax slice"
+      preserveAspectRatio={`xMidYMax ${fit}`}
       className={className}
       role="img"
       aria-label="Resident reporting waste with a phone"

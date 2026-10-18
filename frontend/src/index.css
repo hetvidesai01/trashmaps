@@ -259,6 +259,7 @@ h4 {
 }
 
 .tm-sway {
+  transform-box: fill-box;
   transform-origin: 50% 100%;
   animation: tm-sway 5s ease-in-out infinite;
 }
@@ -267,6 +268,135 @@ h4 {
   transform-box: fill-box;
   transform-origin: center;
   animation: tm-twinkle 2.4s ease-in-out infinite;
+}
+
+/* ---- Landing scene: ambient loops (6-90s). All disabled for reduced motion. ---- */
+
+@keyframes tm-cloud {
+  from {
+    transform: translateX(var(--from));
+  }
+  to {
+    transform: translateX(var(--to));
+  }
+}
+
+@keyframes tm-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate(26px, -34px) rotate(140deg);
+  }
+  88% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(54px, -70px) rotate(280deg);
+  }
+}
+
+@keyframes tm-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes tm-dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+@keyframes tm-card-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.tm-cloud {
+  will-change: transform;
+  animation: tm-cloud var(--dur, 90s) linear infinite;
+}
+
+.tm-drive {
+  will-change: transform;
+  animation: tm-cloud var(--dur, 44s) linear infinite;
+}
+
+.tm-leaf {
+  animation: tm-float var(--dur, 14s) ease-in-out infinite;
+}
+
+.tm-bob {
+  animation: tm-bob 0.7s ease-in-out infinite;
+}
+
+.tm-dash {
+  stroke-dasharray: 4 9;
+  animation: tm-dash 3.5s linear infinite;
+}
+
+/* Scene composition follows the viewport shape: phone / tablet portrait / wide. */
+.tm-scene-tablet,
+.tm-scene-wide {
+  display: none;
+}
+
+@media (min-aspect-ratio: 3/4) {
+  .tm-scene-phone {
+    display: none;
+  }
+  .tm-scene-tablet {
+    display: block;
+  }
+}
+
+@media (min-aspect-ratio: 11/10) {
+  .tm-scene-tablet {
+    display: none;
+  }
+  .tm-scene-wide {
+    display: block;
+  }
+}
+
+/* Role cards: illustration reacts to hover/focus of the whole card. */
+.tm-role-card .tm-card-art {
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.tm-role-card:hover .tm-card-art,
+.tm-role-card:focus-visible .tm-card-art {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.tm-role-card:hover .tm-dash {
+  animation-duration: 1.2s;
+}
+
+.tm-role-card .tm-card-arrow {
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.tm-role-card:hover .tm-card-arrow,
+.tm-role-card:focus-visible .tm-card-arrow {
+  transform: translateX(5px);
 }
 
 /* Hover / press feedback shared by cards and buttons. */
@@ -288,6 +418,21 @@ h4 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .tm-cloud,
+  .tm-drive,
+  .tm-leaf,
+  .tm-bob,
+  .tm-dash,
+  .tm-sway,
+  .tm-twinkle {
+    animation: none !important;
+  }
+
+  .tm-role-card:hover,
+  .tm-role-card:active {
+    transform: none !important;
+  }
+
   *,
   *::before,
   *::after {

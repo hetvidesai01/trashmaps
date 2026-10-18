@@ -1,25 +1,24 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, ShieldCheck, Truck, Users } from 'lucide-react'
+import { ArrowLeft, ShieldCheck } from 'lucide-react'
 import { Button } from '../../components/common/Button'
 import { inputClasses, labelClasses } from '../../components/forms/fieldStyles'
-import { LeafMark, SceneBackdrop } from '../../components/illustrations'
+import { AnimatedBackdrop, LeafMark } from '../../components/illustrations'
+import { Landing } from '../Landing'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_HOME } from '../../auth/roleHome'
 import type { UserRole } from '../../auth/authStorage'
 
 interface LocationState {
   from?: string
+  /** Set when arriving from the public landing page with a role already chosen. */
+  mode?: UserRole
 }
 
 type LoginMode = 'choice' | UserRole
 
-const HEADER_COPY: Record<LoginMode, { title: string; description: string }> = {
-  choice: {
-    title: 'TrashMaps',
-    description: 'Cleaner Cities.\nSmarter Routes.',
-  },
+const HEADER_COPY: Record<UserRole, { title: string; description: string }> = {
   authority: {
     title: 'Authority login',
     description: 'Sign in with your municipal authority credentials.',
@@ -30,39 +29,11 @@ const HEADER_COPY: Record<LoginMode, { title: string; description: string }> = {
   },
 }
 
-interface RoleCardProps {
-  icon: typeof Truck
-  title: string
-  description: string
-  tint: string
-  iconColor: string
-  onClick: () => void
-}
-
-function RoleCard({ icon: Icon, title, description, tint, iconColor, onClick }: RoleCardProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`tm-press group flex w-full items-center gap-4 rounded-3xl border border-white/70 px-5 py-4 text-left shadow-card ${tint}`}
-    >
-      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/80">
-        <Icon size={26} strokeWidth={1.9} className={iconColor} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-base font-extrabold text-ink">{title}</span>
-        <span className="mt-0.5 block text-xs font-semibold leading-snug text-muted">{description}</span>
-      </span>
-      <ArrowRight size={20} className="shrink-0 text-muted transition-transform group-hover:translate-x-1" />
-    </button>
-  )
-}
-
 export function Login() {
   const { isAuthenticated, role, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [mode, setMode] = useState<LoginMode>('choice')
+  const [mode, setMode] = useState<LoginMode>(() => (location.state as LocationState | null)?.mode ?? 'choice')
   const [showFormHint, setShowFormHint] = useState(false)
 
   if (isAuthenticated && role) {
@@ -86,53 +57,26 @@ export function Login() {
     setMode(nextMode)
   }
 
+  if (mode === 'choice') {
+    return <Landing onSelect={selectMode} />
+  }
+
   const { title, description } = HEADER_COPY[mode]
-  const isChoice = mode === 'choice'
 
   return (
     <div className="relative min-h-svh overflow-hidden bg-[#f3f4e4]">
-      <SceneBackdrop width={420} height={820} className="absolute inset-0 h-full w-full md:hidden" />
-      <SceneBackdrop width={1360} height={820} className="absolute inset-0 hidden h-full w-full md:block" />
+      <AnimatedBackdrop />
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-md flex-col px-6 pb-10 pt-12">
         <header className="tm-rise flex flex-col items-center text-center">
-          <LeafMark className={isChoice ? 'h-16 w-16' : 'h-12 w-12'} />
-          <h1
-            className={`font-display font-semibold tracking-tight text-primary-dark ${
-              isChoice ? 'mt-1 text-5xl' : 'mt-3 text-3xl'
-            }`}
-          >
-            {title}
-          </h1>
-          <p className="mt-3 max-w-xs whitespace-pre-line text-base font-semibold leading-snug text-ink/80">
-            {description}
-          </p>
+          <LeafMark className="h-12 w-12" />
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-primary-dark">{title}</h1>
+          <p className="mt-3 max-w-xs text-base font-semibold leading-snug text-ink/80">{description}</p>
         </header>
 
         <div className="flex-1" />
 
         <div className="tm-rise mt-10" style={{ animationDelay: '0.12s' }}>
-          {isChoice && (
-            <div className="space-y-3.5">
-              <RoleCard
-                icon={Truck}
-                title="Continue as Authority"
-                description="For verified waste-management personnel"
-                tint="bg-sage-soft/95"
-                iconColor="text-primary"
-                onClick={() => selectMode('authority')}
-              />
-              <RoleCard
-                icon={Users}
-                title="Continue as Citizen"
-                description="Report waste for a cleaner city"
-                tint="bg-surface/95"
-                iconColor="text-[#3d6f9e]"
-                onClick={() => selectMode('citizen')}
-              />
-            </div>
-          )}
-
           {mode === 'citizen' && (
             <div className="rounded-3xl border border-white/70 bg-surface p-6 shadow-lift">
               <BackButton onClick={() => selectMode('choice')} />

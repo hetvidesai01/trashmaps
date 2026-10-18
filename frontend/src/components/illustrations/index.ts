@@ -1,6 +1,6 @@
 export { LeafMark } from './LeafMark'
-export { GarbageTruck } from './GarbageTruck'
+export { GarbageTruck, TruckShapes } from './GarbageTruck'
 export { RecycleBin } from './RecycleBin'
-export { SceneBackdrop } from './SceneBackdrop'
+export { AnimatedBackdrop } from './AnimatedScene'
 export { CitizenReporter } from './CitizenReporter'
 export { Tree, Cypress, Shrub, Leaf, Sparkle } from './Foliage'

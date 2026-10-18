@@ -26,6 +26,9 @@ export function AppLayout() {
     )
   }
 
+  const isLanding = !role && pathname === '/'
+  if (isLanding) return page
+
   return (
     <div className="flex min-h-svh flex-col bg-bg">
       <TopBar />
